@@ -35,6 +35,12 @@ textarea{font-family:inherit}
   backdrop-filter:blur(24px) saturate(200%);
   -webkit-backdrop-filter:blur(24px) saturate(200%);
 }
+.glass-sidebar{
+  background:rgba(255,255,255,0.65);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-right:0.5px solid rgba(0,0,0,0.04);
+}
 .safe-bottom{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .animate-in{animation:fadeIn 0.3s ease-out}
@@ -47,10 +53,8 @@ textarea{font-family:inherit}
 <script type="text/babel">
 const {useState,useRef,useEffect} = React;
 
-/* ═══ Google Sheets ═══ */
 const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQU97_ZCoBzm6yAZymP-rECJTxZ4BfaGpj07IyqSv7ZW-GAErikF3wKBXwpo2deRsn/exec";
 
-/* ═══ Questions ═══ */
 const questions = [
   {id:1,section:"影片 A：開場影片（約 2 分鐘）",type:"confirm",title:"開場影片的方向，我目前理解是這樣：",prefilled:"約 2 分鐘，歡樂氛圍，目的是吸引眼球、帶動全場氣氛",hint:"如果有要修正或補充，直接說就好",prompts:["對，就是這個方向","大方向對，但要補充⋯","不太對，我想要的是⋯"]},
   {id:2,section:"影片 A：開場影片（約 2 分鐘）",type:"confirm",title:"入鏡人物的部分，我知道有環境部部長，還有另一位長官？",prefilled:"環境部部長（確定入鏡）＋ 另一位長官（待確認是誰）",hint:"請告訴我另一位長官是誰",prompts:["另一位是 ___（請說出名字或職稱）","目前還不確定，之後再補","不只兩位，其實還有⋯"]},
@@ -84,46 +88,108 @@ const SC = {
   "整體 & 補充":{badge:"+",accent:"#7C3AED",light:"#EDE9FE",dark:"#5B21B6",progress:"#A855F7",promptBg:"rgba(237,233,254,0.45)",promptBorder:"rgba(124,58,237,0.18)",confirmBg:"rgba(237,233,254,0.35)",confirmBorder:"rgba(124,58,237,0.30)"},
 };
 
-/* ═══ Styles ═══ */
+const sections = ["影片 A：開場影片（約 2 分鐘）","影片 B：1999 整合介紹","整體 & 補充"];
+
 const S = {
-  page:{minHeight:"100vh",display:"flex",flexDirection:"column"},
-  center:{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:16},
-  card:{padding:28},
   badge:(sc)=>({display:"inline-flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:8,background:sc.light,color:sc.dark,fontSize:13,fontWeight:700}),
-  sectionBadge:(sc)=>({display:"inline-flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:999,background:"rgba(255,255,255,0.55)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"0.5px solid rgba(255,255,255,0.4)",fontSize:12,color:"#475569",fontWeight:500}),
-  pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(59,130,246,0.08)",color:"#2563EB",fontSize:11,fontWeight:600,letterSpacing:"0.02em"},
-  btnPrimary:{padding:"13px 28px",background:"#0F172A",color:"#fff",borderRadius:12,fontSize:15,fontWeight:600,border:"none",cursor:"pointer",transition:"all 0.2s",letterSpacing:"0.01em"},
+  pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(59,130,246,0.08)",color:"#2563EB",fontSize:11,fontWeight:600},
+  btnPrimary:{padding:"13px 28px",background:"#0F172A",color:"#fff",borderRadius:12,fontSize:15,fontWeight:600,border:"none",cursor:"pointer",transition:"all 0.2s"},
   btnSecondary:{padding:"13px 28px",background:"rgba(255,255,255,0.55)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"0.5px solid rgba(0,0,0,0.06)",color:"#475569",borderRadius:12,fontSize:14,fontWeight:500,cursor:"pointer",transition:"all 0.2s"},
   btnText:{padding:"10px 14px",background:"none",border:"none",color:"#64748B",fontSize:14,fontWeight:500,cursor:"pointer"},
   textarea:{width:"100%",background:"rgba(255,255,255,0.85)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:12,padding:16,fontSize:16,color:"#1E293B",border:"0.5px solid rgba(0,0,0,0.06)",outline:"none",resize:"none",minHeight:100,lineHeight:1.7,fontFamily:"inherit"},
 };
 
-/* ═══ Icons (inline SVG) ═══ */
-const VideoIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l5-3v10l-5-3"/>
-  </svg>
-);
-const ChevronLeft = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 18l-6-6 6-6"/>
-  </svg>
-);
-const ChevronRight = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 18l6-6-6-6"/>
-  </svg>
-);
-const CheckIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 13l4 4L19 7"/>
-  </svg>
-);
-const SendIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-  </svg>
-);
+/* ═══ Icons ═══ */
+const VideoIcon = () => (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l5-3v10l-5-3"/></svg>);
+const ChevronLeft = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>);
+const ChevronRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>);
+const CheckIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>);
+const SendIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>);
+const MenuIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>);
+
+/* ═══ Timeline (top progress) ═══ */
+function Timeline({currentIndex, answers}) {
+  return (
+    <div style={{display:"flex",gap:2,padding:"6px 12px",alignItems:"center"}}>
+      {sections.map((sec, si) => {
+        const sc = SC[sec];
+        const qs = questions.filter(q => q.section === sec);
+        const startIdx = questions.findIndex(q => q.section === sec);
+        return (
+          <React.Fragment key={si}>
+            {si > 0 && <div style={{width:1,height:10,background:"rgba(0,0,0,0.08)",flexShrink:0}}/>}
+            <div style={{display:"flex",gap:1,flex:qs.length}}>
+              {qs.map((q, qi) => {
+                const idx = startIdx + qi;
+                const answered = answers[idx] && answers[idx].trim();
+                const current = idx === currentIndex;
+                return <div key={idx} style={{flex:1,height:current?6:4,borderRadius:3,background:current?sc.accent:answered?sc.progress:"rgba(0,0,0,0.06)",transition:"all 0.3s",opacity:answered&&!current?0.6:1}}/>;
+              })}
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══ Sidebar ═══ */
+function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose}) {
+  if (!isWide && !showMobile) return null;
+  const style = isWide
+    ? {width:260,flexShrink:0,overflowY:"auto",padding:"16px 12px"}
+    : {position:"fixed",top:0,left:0,bottom:0,width:280,zIndex:100,padding:"16px 12px",overflowY:"auto",boxShadow:"4px 0 30px rgba(0,0,0,0.1)"};
+
+  return (
+    <>
+      {!isWide && <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.2)",zIndex:99}}/>}
+      <div className="glass-sidebar" style={style}>
+        <div style={{fontSize:13,fontWeight:700,color:"#0F172A",marginBottom:12,padding:"0 4px"}}>
+          題目列表
+          {!isWide && <button onClick={onClose} style={{float:"right",background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#94A3B8"}}>✕</button>}
+        </div>
+        {sections.map(sec => {
+          const sc = SC[sec];
+          const qs = questions.filter(q => q.section === sec);
+          const startIdx = questions.findIndex(q => q.section === sec);
+          return (
+            <div key={sec} style={{marginBottom:14}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 4px"}}>
+                <span style={{...S.badge(sc),width:20,height:20,fontSize:9,borderRadius:5}}>{sc.badge}</span>
+                <span style={{fontSize:11,fontWeight:600,color:"#64748B"}}>{sec.split("：")[0]}</span>
+              </div>
+              {qs.map((q, qi) => {
+                const idx = startIdx + qi;
+                const answered = answers[idx] && answers[idx].trim();
+                const current = idx === currentIndex;
+                return (
+                  <button key={idx} onClick={() => { onJumpTo(idx); if(!isWide) onClose(); }} style={{
+                    display:"flex",alignItems:"center",gap:8,width:"100%",textAlign:"left",
+                    padding:"7px 8px",borderRadius:8,marginBottom:2,border:"none",cursor:"pointer",
+                    background:current?"rgba(15,23,42,0.06)":"transparent",
+                    transition:"all 0.15s",
+                    borderLeft:current?"3px solid "+sc.accent:"3px solid transparent",
+                  }}>
+                    <span style={{
+                      flexShrink:0,width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
+                      fontSize:10,fontWeight:700,
+                      background:answered?sc.light:current?"rgba(0,0,0,0.04)":"transparent",
+                      color:answered?sc.dark:"#94A3B8",
+                    }}>{q.id}</span>
+                    <span style={{fontSize:12,color:current?"#0F172A":"#64748B",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
+                      {q.title.slice(0,18)}{q.title.length>18?"⋯":""}
+                    </span>
+                    {answered && <span style={{flexShrink:0,width:6,height:6,borderRadius:"50%",background:sc.progress}}/>}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
 
 function App() {
   const [currentIndex, setCurrentIndex] = useState(-1);
@@ -132,8 +198,16 @@ function App() {
   const [showOverview, setShowOverview] = useState(false);
   const [expandedPrompts, setExpandedPrompts] = useState(true);
   const [submitStatus, setSubmitStatus] = useState("idle");
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [isWide, setIsWide] = useState(typeof window!=="undefined" && window.innerWidth >= 768);
   const submittingRef = useRef(false);
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const h = () => setIsWide(window.innerWidth >= 768);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
 
   useEffect(() => {
     if (textareaRef.current && currentIndex >= 0)
@@ -159,8 +233,7 @@ function App() {
   const handlePromptClick = (p) => {
     const cur = answers[currentIndex] || "";
     const clean = p.replace(/[？？]$/, "");
-    const val = cur ? cur + "\n" + clean : clean;
-    setAnswers(prev => ({...prev, [currentIndex]: val}));
+    setAnswers(prev => ({...prev, [currentIndex]: cur ? cur+"\n"+clean : clean}));
     if (textareaRef.current) textareaRef.current.focus();
   };
 
@@ -168,54 +241,31 @@ function App() {
     if (!SHEET_SCRIPT_URL || submittingRef.current) return;
     submittingRef.current = true;
     setSubmitStatus("submitting");
-    const payload = JSON.stringify({
-      timestamp: new Date().toLocaleString("zh-TW"),
-      answers: questions.map((q, i) => answers[i] || "（未填寫）"),
-    });
+    const payload = JSON.stringify({timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>answers[i]||"（未填寫）")});
     let iframe = document.getElementById("sheet-submit-frame");
-    if (!iframe) {
-      iframe = document.createElement("iframe");
-      iframe.id = "sheet-submit-frame";
-      iframe.name = "sheet-submit";
-      iframe.style.display = "none";
-      document.body.appendChild(iframe);
-    }
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = SHEET_SCRIPT_URL;
-    form.target = "sheet-submit";
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "data";
-    input.value = payload;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    if (!iframe) { iframe = document.createElement("iframe"); iframe.id="sheet-submit-frame"; iframe.name="sheet-submit"; iframe.style.display="none"; document.body.appendChild(iframe); }
+    const form = document.createElement("form"); form.method="POST"; form.action=SHEET_SCRIPT_URL; form.target="sheet-submit";
+    const input = document.createElement("input"); input.type="hidden"; input.name="data"; input.value=payload;
+    form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
     setTimeout(() => { setSubmitStatus("success"); }, 2500);
   };
 
-
-  /* ════════════════════════════════════════ */
   /* ═══ Welcome ═══ */
-  /* ════════════════════════════════════════ */
   if (currentIndex === -1 && !isComplete && !showOverview) {
     return (
-      <div style={S.center}>
-        <div className="glass animate-in" style={{maxWidth:460,width:"100%",...S.card,textAlign:"center"}}>
-          <div style={{width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#0F172A,#334155)",display:"inline-flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
-            <VideoIcon/>
-          </div>
-          <h1 style={{fontSize:21,fontWeight:700,color:"#0F172A",marginBottom:6,letterSpacing:"-0.01em"}}>環境部影片需求確認</h1>
+      <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+        <div className="glass animate-in" style={{maxWidth:460,width:"100%",padding:28,textAlign:"center"}}>
+          <div style={{width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#0F172A,#334155)",display:"inline-flex",alignItems:"center",justifyContent:"center",marginBottom:20}}><VideoIcon/></div>
+          <h1 style={{fontSize:21,fontWeight:700,color:"#0F172A",marginBottom:6}}>環境部影片需求確認</h1>
           <p style={{color:"#94A3B8",fontSize:14,marginBottom:4}}>兩支影片 · 共 {total} 題</p>
           <p style={{color:"#CBD5E1",fontSize:12,marginBottom:24}}>我已整理目前掌握的資訊，請副總確認與補充</p>
 
           <div style={{background:"rgba(255,255,255,0.5)",borderRadius:12,padding:18,marginBottom:14,textAlign:"left",border:"0.5px solid rgba(0,0,0,0.04)"}}>
             <p style={{fontSize:13,fontWeight:600,color:"#334155",marginBottom:10}}>已掌握的資訊</p>
             <div style={{fontSize:13,color:"#475569",lineHeight:2.0}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC["影片 A：開場影片（約 2 分鐘）"]),width:20,height:20,fontSize:10,borderRadius:6}}>A</span> 開場約 2 分鐘，歡樂氛圍，部長入鏡</div>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC["影片 B：1999 整合介紹"]),width:20,height:20,fontSize:10,borderRadius:6}}>B</span> 1999 服務整合介紹，一鏡到底風格</div>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC["整體 & 補充"]),width:20,height:20,fontSize:10,borderRadius:6}}>+</span> 不只 1999，也要帶到 LINE 及其他管道</div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[0]]),width:20,height:20,fontSize:10,borderRadius:6}}>A</span> 開場約 2 分鐘，歡樂氛圍，部長入鏡</div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[1]]),width:20,height:20,fontSize:10,borderRadius:6}}>B</span> 1999 服務整合介紹，一鏡到底風格</div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[2]]),width:20,height:20,fontSize:10,borderRadius:6}}>+</span> 不只 1999，也要帶到 LINE 及其他管道</div>
             </div>
           </div>
 
@@ -230,171 +280,129 @@ function App() {
             </div>
           </div>
 
-          <button onClick={() => setCurrentIndex(0)} style={{...S.btnPrimary,width:"100%",padding:"15px 28px",fontSize:16}}>
-            開始填寫
-          </button>
+          <button onClick={() => setCurrentIndex(0)} style={{...S.btnPrimary,width:"100%",padding:"15px 28px",fontSize:16}}>開始填寫</button>
         </div>
       </div>
     );
   }
 
-  /* ════════════════════════════════════════ */
   /* ═══ Overview / Complete ═══ */
-  /* ════════════════════════════════════════ */
   if (showOverview || isComplete) {
     let sec = "";
     return (
       <div style={{minHeight:"100vh",padding:16}}>
         <div style={{maxWidth:600,margin:"0 auto"}}>
           <div className="glass animate-in" style={{padding:24,marginBottom:16}}>
-            <h2 style={{fontSize:19,fontWeight:700,color:"#0F172A",marginBottom:4}}>
-              {isComplete ? "確認完成！感謝您的回覆" : "問卷總覽"}
-            </h2>
+            <h2 style={{fontSize:19,fontWeight:700,color:"#0F172A",marginBottom:4}}>{isComplete ? "確認完成！感謝您的回覆" : "問卷總覽"}</h2>
             <p style={{color:"#94A3B8",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題</p>
             <div style={{width:"100%",background:"rgba(0,0,0,0.04)",borderRadius:999,height:6,marginBottom:20}}>
               <div style={{background:"#0F172A",height:6,borderRadius:999,transition:"width 0.5s",width:(answeredCount/total*100)+"%"}}/>
             </div>
-
             <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:submitStatus==="submitting"?0.6:1,background:submitStatus==="success"?"#059669":"#0F172A"}}>
               <SendIcon/>
-              {submitStatus==="idle" && "送出回覆"}
-              {submitStatus==="submitting" && "送出中⋯"}
-              {submitStatus==="success" && "已成功送出"}
-              {submitStatus==="error" && "送出失敗，點此重試"}
+              {submitStatus==="idle"&&"送出回覆"}{submitStatus==="submitting"&&"送出中⋯"}{submitStatus==="success"&&"已成功送出"}{submitStatus==="error"&&"送出失敗，點此重試"}
             </button>
-            {submitStatus==="success" && <p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已成功送出！</p>}
+            {submitStatus==="success"&&<p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已成功送出！</p>}
           </div>
 
-          {questions.map((q, i) => {
-            const isNew = q.section !== sec;
-            if (isNew) sec = q.section;
-            const c = SC[q.section];
-            const has = answers[i] && answers[i].trim();
-            return (
-              <div key={q.id}>
-                {isNew && (
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}>
-                    <span style={S.badge(c)}>{c.badge}</span>
-                    <span style={{fontWeight:600,color:"#334155",fontSize:13}}>{q.section}</span>
-                  </div>
-                )}
-                <button onClick={() => jumpTo(i)} style={{width:"100%",textAlign:"left",borderRadius:12,padding:14,marginBottom:6,border:has?"1.5px solid "+c.confirmBorder:"0.5px solid rgba(0,0,0,0.04)",cursor:"pointer",transition:"all 0.2s",background:has?"rgba(255,255,255,0.75)":"rgba(255,255,255,0.55)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-                  <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
-                    <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(0,0,0,0.03)",color:has?c.dark:"#94A3B8"}}>{q.id}</span>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
-                        <span style={{fontSize:13,fontWeight:500,color:"#334155"}}>{q.title}</span>
-                        {q.type==="confirm" && <span style={S.pillBadge}>已知待確認</span>}
-                      </div>
-                      {has ? <p style={{fontSize:12,color:"#64748B",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",margin:0}}>{answers[i]}</p>
-                           : <p style={{fontSize:12,color:"#CBD5E1",fontStyle:"italic",margin:0}}>尚未填寫</p>}
+          {questions.map((q,i) => {
+            const isNew = q.section !== sec; if (isNew) sec = q.section;
+            const c = SC[q.section]; const has = answers[i] && answers[i].trim();
+            return (<div key={q.id}>
+              {isNew && <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}><span style={S.badge(c)}>{c.badge}</span><span style={{fontWeight:600,color:"#334155",fontSize:13}}>{q.section}</span></div>}
+              <button onClick={() => jumpTo(i)} style={{width:"100%",textAlign:"left",borderRadius:12,padding:14,marginBottom:6,border:has?"1.5px solid "+c.confirmBorder:"0.5px solid rgba(0,0,0,0.04)",cursor:"pointer",transition:"all 0.2s",background:has?"rgba(255,255,255,0.75)":"rgba(255,255,255,0.55)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
+                <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+                  <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(0,0,0,0.03)",color:has?c.dark:"#94A3B8"}}>{q.id}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
+                      <span style={{fontSize:13,fontWeight:500,color:"#334155"}}>{q.title}</span>
+                      {q.type==="confirm"&&<span style={S.pillBadge}>已知待確認</span>}
                     </div>
+                    {has?<p style={{fontSize:12,color:"#64748B",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",margin:0}}>{answers[i]}</p>:<p style={{fontSize:12,color:"#CBD5E1",fontStyle:"italic",margin:0}}>尚未填寫</p>}
                   </div>
-                </button>
-              </div>
-            );
+                </div>
+              </button>
+            </div>);
           })}
-
           <div style={{display:"flex",gap:10,marginTop:22,marginBottom:32}}>
             <button onClick={() => {setShowOverview(false);setIsComplete(false);setCurrentIndex(0);}} style={{...S.btnSecondary,flex:1}}>回到第一題</button>
-            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:submitStatus==="success"?"#059669":"#0F172A"}}>
-              <SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}
-            </button>
+            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:submitStatus==="success"?"#059669":"#0F172A"}}><SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}</button>
           </div>
         </div>
       </div>
     );
   }
 
-  /* ════════════════════════════════════════ */
-  /* ═══ Question ═══ */
-  /* ════════════════════════════════════════ */
+  /* ═══ Question (with sidebar + timeline) ═══ */
   return (
-    <div style={S.page}>
+    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column"}}>
       {/* Top bar */}
-      <div className="glass-bar" style={{padding:"10px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"0.5px solid rgba(0,0,0,0.04)"}}>
-        <button onClick={() => setShowOverview(true)} style={{...S.btnText,fontSize:13,padding:"6px 10px",display:"flex",alignItems:"center",gap:2}}>
-          <ChevronLeft/> 總覽
-        </button>
-        <span style={{fontSize:13,color:"#94A3B8",fontWeight:500,fontVariantNumeric:"tabular-nums"}}>{currentIndex+1} / {total}</span>
-        <span style={S.sectionBadge(sc)}>
-          <span style={{...S.badge(sc),width:18,height:18,fontSize:9,borderRadius:5}}>{sc.badge}</span>
-          {currentQuestion.section.split("：")[0]}
-        </span>
+      <div className="glass-bar" style={{padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"0.5px solid rgba(0,0,0,0.04)"}}>
+        {!isWide && <button onClick={() => setShowSidebar(true)} style={{...S.btnText,fontSize:13,padding:"6px 8px",display:"flex",alignItems:"center",gap:4}}><MenuIcon/></button>}
+        {isWide && <button onClick={() => setShowOverview(true)} style={{...S.btnText,fontSize:13,padding:"6px 10px",display:"flex",alignItems:"center",gap:2}}><ChevronLeft/> 總覽</button>}
+        <div style={{flex:1,margin:"0 8px"}}><Timeline currentIndex={currentIndex} answers={answers}/></div>
+        <span style={{fontSize:12,color:"#94A3B8",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>
       </div>
 
-      {/* Progress bar */}
-      <div style={{width:"100%",background:"rgba(0,0,0,0.03)",height:2}}>
-        <div style={{background:sc.progress,height:2,transition:"width 0.5s ease-out",width:((currentIndex+1)/total*100)+"%"}}/>
-      </div>
+      {/* Main area with sidebar */}
+      <div style={{flex:1,display:"flex",overflow:"hidden"}}>
+        {/* Desktop sidebar */}
+        {isWide && <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={true} showMobile={false} onClose={()=>{}}/>}
 
-      {/* Main content */}
-      <div style={{flex:1,overflowY:"auto",padding:"24px 16px"}} className="animate-in" key={currentIndex}>
-        <div style={{maxWidth:480,width:"100%",margin:"0 auto"}}>
-          {/* Badges */}
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
-            <span style={{display:"inline-flex",alignItems:"center",padding:"5px 14px",borderRadius:999,background:sc.light,color:sc.dark,fontSize:13,fontWeight:600}}>
-              第 {currentQuestion.id} 題
-            </span>
-            {currentQuestion.type==="confirm" && <span style={S.pillBadge}>已知待確認</span>}
+        {/* Mobile sidebar (drawer) */}
+        <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={false} showMobile={showSidebar} onClose={() => setShowSidebar(false)}/>
+
+        {/* Question content */}
+        <div style={{flex:1,overflowY:"auto",padding:"24px 16px"}} className="animate-in" key={currentIndex}>
+          <div style={{maxWidth:520,width:"100%",margin:"0 auto"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+              <span style={{display:"inline-flex",alignItems:"center",padding:"5px 14px",borderRadius:999,background:sc.light,color:sc.dark,fontSize:13,fontWeight:600}}>第 {currentQuestion.id} 題</span>
+              {currentQuestion.type==="confirm"&&<span style={S.pillBadge}>已知待確認</span>}
+            </div>
+
+            <h2 style={{fontSize:18,fontWeight:700,color:"#0F172A",marginBottom:10,lineHeight:1.65}}>{currentQuestion.title}</h2>
+
+            {currentQuestion.prefilled && (
+              <div className="glass" style={{padding:14,marginBottom:14,background:sc.confirmBg,border:"1px solid "+sc.confirmBorder,boxShadow:"none"}}>
+                <p style={{fontSize:11,color:"#94A3B8",marginBottom:3,fontWeight:500}}>目前掌握的資訊</p>
+                <p style={{fontSize:14,color:"#334155",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
+              </div>
+            )}
+
+            <p style={{color:"#94A3B8",fontSize:13,marginBottom:16}}>{currentQuestion.hint}</p>
+
+            {currentQuestion.prompts && currentQuestion.prompts.length > 0 && (
+              <div style={{marginBottom:16}}>
+                <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#94A3B8",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
+                  <span>快速選擇</span>
+                  <span style={{fontSize:9,transition:"transform 0.2s",transform:expandedPrompts?"rotate(180deg)":"rotate(0)"}}>&#9650;</span>
+                </button>
+                {expandedPrompts && (
+                  <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                    {currentQuestion.prompts.map((p,pi) => (
+                      <button key={pi} onClick={() => handlePromptClick(p)} style={{display:"block",width:"100%",textAlign:"left",fontSize:14,padding:"10px 12px",borderRadius:10,border:"0.5px solid "+sc.promptBorder,background:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:"#475569",cursor:"pointer",transition:"all 0.15s",lineHeight:1.5}}>
+                        <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:sc.accent,marginRight:8,position:"relative",top:-1,opacity:0.6}}/>
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <textarea ref={textareaRef} value={answers[currentIndex]||""} onChange={e => setAnswers(prev => ({...prev,[currentIndex]:e.target.value}))} placeholder={currentQuestion.type==="confirm"?"請確認或說明需調整之處⋯":"請輸入您的回覆⋯"} style={S.textarea} rows={4}/>
           </div>
-
-          {/* Title */}
-          <h2 style={{fontSize:18,fontWeight:700,color:"#0F172A",marginBottom:10,lineHeight:1.65,letterSpacing:"-0.01em"}}>{currentQuestion.title}</h2>
-
-          {/* Prefilled info */}
-          {currentQuestion.prefilled && (
-            <div className="glass" style={{padding:14,marginBottom:14,background:sc.confirmBg,border:"1px solid "+sc.confirmBorder,boxShadow:"none"}}>
-              <p style={{fontSize:11,color:"#94A3B8",marginBottom:3,fontWeight:500}}>目前掌握的資訊</p>
-              <p style={{fontSize:14,color:"#334155",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
-            </div>
-          )}
-
-          {/* Hint */}
-          <p style={{color:"#94A3B8",fontSize:13,marginBottom:16}}>{currentQuestion.hint}</p>
-
-          {/* Quick select prompts */}
-          {currentQuestion.prompts && currentQuestion.prompts.length > 0 && (
-            <div style={{marginBottom:16}}>
-              <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#94A3B8",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
-                <span>快速選擇</span>
-                <span style={{fontSize:9,transition:"transform 0.2s",transform:expandedPrompts?"rotate(180deg)":"rotate(0)"}}>&#9650;</span>
-              </button>
-              {expandedPrompts && (
-                <div style={{display:"flex",flexDirection:"column",gap:5}}>
-                  {currentQuestion.prompts.map((p, pi) => (
-                    <button key={pi} onClick={() => handlePromptClick(p)} style={{display:"block",width:"100%",textAlign:"left",fontSize:14,padding:"10px 12px",borderRadius:10,border:"0.5px solid "+sc.promptBorder,background:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:"#475569",cursor:"pointer",transition:"all 0.15s",lineHeight:1.5}}>
-                      <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:sc.accent,marginRight:8,position:"relative",top:-1,opacity:0.6}}/>
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Textarea */}
-          <textarea
-            ref={textareaRef}
-            value={answers[currentIndex] || ""}
-            onChange={e => setAnswers(prev => ({...prev,[currentIndex]:e.target.value}))}
-            placeholder={currentQuestion.type==="confirm" ? "請確認或說明需調整之處⋯" : "請輸入您的回覆⋯"}
-            style={S.textarea}
-            rows={4}
-          />
         </div>
       </div>
 
       {/* Bottom nav */}
-      <div className="glass-bar" style={{borderTop:"0.5px solid rgba(0,0,0,0.04)",padding:"10px 16px"}} >
-        <div className="safe-bottom" style={{maxWidth:480,margin:"0 auto",display:"flex",alignItems:"center",gap:6}}>
-          <button onClick={goPrev} style={{...S.btnText,display:"flex",alignItems:"center",gap:2}}>
-            <ChevronLeft/> 上一題
-          </button>
+      <div className="glass-bar" style={{borderTop:"0.5px solid rgba(0,0,0,0.04)",padding:"10px 16px"}}>
+        <div className="safe-bottom" style={{maxWidth:520,margin:"0 auto",display:"flex",alignItems:"center",gap:6}}>
+          <button onClick={goPrev} style={{...S.btnText,display:"flex",alignItems:"center",gap:2}}><ChevronLeft/> 上一題</button>
           <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"#CBD5E1"}}>跳過</button>
           <div style={{flex:1}}/>
           <button onClick={goNext} style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:4}}>
-            {currentIndex === total - 1 ? (<><CheckIcon/> 完成</>) : (<>下一題 <ChevronRight/></>)}
+            {currentIndex===total-1?(<><CheckIcon/> 完成</>):(<>下一題 <ChevronRight/></>)}
           </button>
         </div>
       </div>
