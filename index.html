@@ -113,16 +113,16 @@ button:active{transform:scale(0.96)}
 <script type="text/babel">
 const {useState,useRef,useEffect,useCallback,useMemo} = React;
 
-const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-D28sopw6kyZcMiGm4n5IW1C8snnUUvXU31GVkuEmTcRO2_RHPMAffngIE9viMN8WMw/exec";
+const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQU97_ZCoBzm6yAZymP-rECJTxZ4BfaGpj07IyqSv7ZW-GAErikF3wKBXwpo2deRsn/exec";
 
 const questions = [
   /* ═══ A: 整體背景（先搞清楚大方向）═══ */
-  {id:1,section:"A 整體背景",type:"open",title:"這兩支影片會在什麼場合播放？",prefilled:"",hint:"在什麼場地、什麼時機",prompts:["活動現場大螢幕","也會放到網路上（YouTube、社群等）","只在活動現場播，不對外公開","活動後也會用於其他場合（記者會、內部報告等）"]},
-  {id:2,section:"A 整體背景",type:"open",title:"現場觀眾主要是哪些人？",prefilled:"",hint:"知道觀眾是誰，影片的語氣和節奏才能對味",prompts:["環境部內部同仁","各縣市環保局代表","民意代表 / 議員","媒體記者","一般民眾 / 里長 / 社區代表","以上好幾種混合（請說明）"]},
-  {id:3,section:"A 整體背景",type:"open",title:"活動日期大概什麼時候？我需要多少時間製作？",prefilled:"",hint:"讓我排出合理的製作時程",prompts:["活動在 ___ 月（請填入）","希望在 ___ 前完成","時間很趕，需要盡快啟動","時間充裕，慢慢來沒關係"]},
+  {id:1,section:"A 整體背景",type:"open",multi:true,title:"這兩支影片會在什麼場合播放？",prefilled:"",hint:"在什麼場地、什麼時機",prompts:["活動現場大螢幕","也會放到網路上（YouTube、社群等）","只在活動現場播，不對外公開","活動後也會用於其他場合（記者會、內部報告等）"]},
+  {id:2,section:"A 整體背景",type:"open",multi:true,title:"現場觀眾主要是哪些人？",prefilled:"",hint:"知道觀眾是誰，影片的語氣和節奏才能對味",prompts:["環境部內部同仁","各縣市環保局代表","民意代表 / 議員","媒體記者","一般民眾 / 里長 / 社區代表","以上好幾種混合（請說明）"]},
+  {id:3,section:"A 整體背景",type:"open",multi:true,title:"活動日期大概什麼時候？我需要多少時間製作？",prefilled:"",hint:"讓我排出合理的製作時程",prompts:["活動在 ___ 月（請填入）","希望在 ___ 前完成","時間很趕，需要盡快啟動","時間充裕，慢慢來沒關係"]},
   {id:4,section:"A 整體背景",type:"open",title:"預算範圍大概在哪裡？",prefilled:"",hint:"方便我規劃製作規模",prompts:["有明確預算（請填入金額區間）","預算待確認，但希望控制在合理範圍","這題之後再談"]},
   {id:5,section:"A 整體背景",type:"open",title:"有沒有你看過覺得「就是這種感覺」的影片？",prefilled:"",hint:"一個參考影片，比講一百句形容詞都有用",prompts:["有，我之後傳連結給你","某個政府宣傳片我很喜歡（請描述）","某個品牌廣告的感覺很接近（請描述）","沒有特別的參考"]},
-  {id:6,section:"A 整體背景",type:"open",title:"有沒有絕對不能出現的東西？",prefilled:"",hint:"風格、畫面、用詞的地雷區",prompts:["不要太像選舉宣傳片","不要出現特定政治人物或標語","不要太兒戲，畢竟是政府活動","目前沒有特別的禁忌"]},
+  {id:6,section:"A 整體背景",type:"open",multi:true,title:"有沒有絕對不能出現的東西？",prefilled:"",hint:"風格、畫面、用詞的地雷區",prompts:["不要太像選舉宣傳片","不要出現特定政治人物或標語","不要太兒戲，畢竟是政府活動","目前沒有特別的禁忌"]},
 
   /* ═══ B: 開場影片（約 2 分鐘）═══ */
   {id:7,section:"B 開場影片",type:"confirm",title:"開場影片的方向，我目前理解是這樣：",prefilled:"約 2 分鐘，歡樂氛圍，目的是吸引眼球、帶動全場氣氛",hint:"如果有要修正或補充，直接說就好",prompts:["對，就是這個方向","大方向對，但要補充⋯","不太對，我想要的是⋯"]},
@@ -136,13 +136,13 @@ const questions = [
 
   /* ═══ C: 影片 B — 1999 整合介紹 ═══ */
   {id:15,section:"C 1999 整合",type:"confirm",title:"影片 B 的核心訊息，我理解是：",prefilled:"以前民眾要打很多不同號碼處理不同問題，現在整合成 1999 一支電話就能處理",hint:"這樣理解對嗎？有沒有要修正",prompts:["對，核心就是「多線合一」","對，但要強調「不只是電話整合，是服務升級」","方向對，但還要加上⋯"]},
-  {id:16,section:"C 1999 整合",type:"open",title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請說明）"]},
-  {id:17,section:"C 1999 整合",type:"confirm",title:"您提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
+  {id:16,section:"C 1999 整合",type:"open",multi:true,title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請說明）"]},
+  {id:17,section:"C 1999 整合",type:"confirm",multi:true,title:"您提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
   {id:18,section:"C 1999 整合",type:"confirm",title:"您提到想用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
-  {id:19,section:"C 1999 整合",type:"open",title:"一鏡到底的畫面，你心中的場景是怎樣走的？",prefilled:"",hint:"想像鏡頭從哪裡開始、經過哪裡、在哪裡結束",prompts:["從民眾遇到問題開始 → 撥打 1999 → 問題被處理","從辦公室接線場景 → 走到戶外各種服務現場","從以前（分散打電話）→ 過渡到現在（一通搞定）","從 1999 電話 → 延伸到 LINE → 到其他管道","我沒有具體想法，交給你發想"]},
+  {id:19,section:"C 1999 整合",type:"open",multi:true,title:"一鏡到底的畫面，你心中的場景是怎樣走的？",prefilled:"",hint:"想像鏡頭從哪裡開始、經過哪裡、在哪裡結束",prompts:["從民眾遇到問題開始 → 撥打 1999 → 問題被處理","從辦公室接線場景 → 走到戶外各種服務現場","從以前（分散打電話）→ 過渡到現在（一通搞定）","從 1999 電話 → 延伸到 LINE → 到其他管道","我沒有具體想法，交給你發想"]},
   {id:20,section:"C 1999 整合",type:"open",title:"影片 B 大概多長？",prefilled:"",hint:"有沒有時間限制",prompts:["2 分鐘以內","3 分鐘左右","5 分鐘以內都可以","沒有特別限制，看內容需要"]},
   {id:21,section:"C 1999 整合",type:"open",title:"影片 B 的整體風格要什麼感覺？",prefilled:"",hint:"跟開場影片是同風格還是不同",prompts:["跟開場一樣歡樂活潑","比開場稍微正式一點，但不要太嚴肅","專業清晰，像一支好的說明影片","溫暖感人路線，讓人覺得政府在進步"]},
-  {id:22,section:"C 1999 整合",type:"open",title:"影片 B 需要哪些人出現在畫面中？",prefilled:"",hint:"跟開場影片一樣的人，還是不同陣容",prompts:["跟開場一樣 — 部長 ＋ 另一位長官","不需要長官，用字幕搭配畫面就好","需要接線人員或服務人員的畫面","需要民眾 / 市民的使用畫面","用動畫或圖表呈現，不需要真人"]},
+  {id:22,section:"C 1999 整合",type:"open",multi:true,title:"影片 B 需要哪些人出現在畫面中？",prefilled:"",hint:"跟開場影片一樣的人，還是不同陣容",prompts:["跟開場一樣 — 部長 ＋ 另一位長官","不需要長官，用字幕搭配畫面就好","需要接線人員或服務人員的畫面","需要民眾 / 市民的使用畫面","用動畫或圖表呈現，不需要真人"]},
   {id:23,section:"C 1999 整合",type:"open",title:"影片 B 結尾要怎麼收？",prefilled:"",hint:"最後一個畫面你想看到什麼",prompts:["大大的 1999 號碼 ＋ LINE QR Code","一句 slogan 字卡，像是「一通電話，搞定所有環境大小事」","回到部長畫面定格作為收尾","所有管道（電話、LINE、APP）一起出現在畫面上"]},
 
   /* ═══ D: 影片規格（技術面確認）═══ */
@@ -408,12 +408,24 @@ function App() {
   const jumpTo = useCallback((i) => { setSlideDir(i > currentIndex ? "left" : "right"); setCurrentIndex(i); setCameFromOverview(showOverview || isComplete); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true); }, [currentIndex, showOverview, isComplete]);
 
   const cleanPrompt = (p) => p.replace(/[？？]$/, "");
-  const isPromptSelected = (p) => { const a = getAns(currentIndex); return a.selected.trim() === cleanPrompt(p); };
+  const isMulti = currentQuestion ? !!currentQuestion.multi : false;
+  const isPromptSelected = (p) => {
+    const a = getAns(currentIndex); const clean = cleanPrompt(p);
+    if (isMulti) return a.selected.split("\n").some(l => l.trim() === clean);
+    return a.selected.trim() === clean;
+  };
   const handlePromptClick = (p) => {
     const clean = cleanPrompt(p);
     setAnswers(prev => {
       const old = prev[currentIndex]; const note = (old && typeof old === "object") ? old.note : "";
-      return {...prev, [currentIndex]: {selected: isPromptSelected(p) ? "" : clean, note}};
+      const sel = (old && typeof old === "object") ? old.selected : "";
+      if (isMulti) {
+        const lines = sel.split("\n").filter(l => l.trim());
+        const idx = lines.findIndex(l => l.trim() === clean);
+        if (idx >= 0) { lines.splice(idx, 1); } else { lines.push(clean); }
+        return {...prev, [currentIndex]: {selected: lines.join("\n"), note}};
+      }
+      return {...prev, [currentIndex]: {selected: sel.trim() === clean ? "" : clean, note}};
     });
   };
   const setNote = (val) => { setAnswers(prev => { const old = prev[currentIndex]; const sel = (old && typeof old === "object") ? old.selected : (typeof old === "string" ? old : ""); return {...prev, [currentIndex]: {selected:sel, note:val}}; }); };
@@ -601,7 +613,7 @@ function App() {
             {currentQuestion.prompts && currentQuestion.prompts.length > 0 && (
               <div style={{marginBottom:16}}>
                 <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"rgba(255,255,255,0.5)",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
-                  <span>快速選擇</span>
+                  <span>{isMulti ? "快速選擇（可多選）" : "快速選擇"}</span>
                   <span style={{fontSize:9,transition:"transform 0.2s",transform:expandedPrompts?"rotate(180deg)":"rotate(0)"}}>&#9650;</span>
                 </button>
                 {expandedPrompts && (
@@ -625,9 +637,16 @@ function App() {
             {curAns.selected.trim() && (
               <div style={{padding:14,marginBottom:10,borderRadius:14,background:sc.light,border:`1px solid ${sc.confirmBorder}`,position:"relative"}}>
                 <p style={{fontSize:11,color:sc.dark,marginBottom:4,fontWeight:600,opacity:0.7}}>已選擇</p>
-                <p style={{fontSize:14,color:"rgba(255,255,255,0.9)",lineHeight:1.6,margin:0}}>{curAns.selected}</p>
-                <button onClick={() => handlePromptClick(curAns.selected)} title="取消選擇" style={{position:"absolute",top:10,right:10,background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"rgba(255,255,255,0.4)",display:"flex"}}>
-                  <CloseIcon/>
+                <div style={{fontSize:14,color:"rgba(255,255,255,0.9)",lineHeight:1.8,margin:0}}>
+                  {curAns.selected.split("\n").filter(l=>l.trim()).map((line,li) => (
+                    <div key={li} style={{display:"flex",alignItems:"center",gap:6}}>
+                      {isMulti && <span style={{color:sc.dark,fontSize:12}}>·</span>}
+                      {line}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={clearAnswer} title="清除全部選擇" style={{position:"absolute",top:10,right:10,background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"rgba(255,255,255,0.4)",display:"flex"}}>
+                  <TrashIcon/>
                 </button>
               </div>
             )}
