@@ -12,9 +12,11 @@ var HEADERS = [
   "E31 補充"
 ];
 
+var TARGET_SHEET_ID = "1NulQPHDvnSC1GD1DuxApOPbzPKtrrgZeY_1NeXew2lM";
+
 function doPost(e) {
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var sheet = SpreadsheetApp.openById(TARGET_SHEET_ID).getActiveSheet();
 
     // 支援表單提交 (e.parameter.data) 和 JSON body (e.postData.contents)
     var raw;
@@ -64,6 +66,6 @@ function doGet(e) {
  * 在 Apps Script 編輯器中選擇此函式 → 執行
  */
 function updateHeaders() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var sheet = SpreadsheetApp.openById(TARGET_SHEET_ID).getActiveSheet();
   sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
 }
