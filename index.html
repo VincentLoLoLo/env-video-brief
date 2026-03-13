@@ -178,8 +178,8 @@ const S = {
   badge:(sc)=>({display:"inline-flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:8,background:sc.light,color:sc.dark||sc.accent,fontSize:13,fontWeight:700}),
   pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(129,140,248,0.12)",color:"#818CF8",fontSize:11,fontWeight:600},
   btnPrimary:{padding:"14px 28px",background:"linear-gradient(135deg,#6366F1,#8B5CF6)",color:"#fff",borderRadius:14,fontSize:15,fontWeight:600,border:"none",cursor:"pointer",boxShadow:"0 4px 20px rgba(99,102,241,0.3)"},
-  btnSecondary:{padding:"14px 28px",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(255,255,255,0.7)",borderRadius:14,fontSize:14,fontWeight:500,cursor:"pointer"},
-  btnText:{padding:"10px 14px",background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:14,fontWeight:500,cursor:"pointer"},
+  btnSecondary:{padding:"14px 28px",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.85)",borderRadius:14,fontSize:14,fontWeight:500,cursor:"pointer"},
+  btnText:{padding:"10px 14px",background:"none",border:"none",color:"rgba(255,255,255,0.55)",fontSize:14,fontWeight:500,cursor:"pointer"},
   textarea:{width:"100%",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:14,padding:16,fontSize:16,color:"rgba(255,255,255,0.9)",border:"1px solid rgba(255,255,255,0.08)",outline:"none",resize:"none",overflow:"hidden",lineHeight:1.7,fontFamily:"inherit"},
 };
 
@@ -242,7 +242,7 @@ function Timeline({currentIndex, answers, isWide}) {
             <div key={qi} style={{flex:1,height:qi===localIdx?5:3,borderRadius:3,background:qi===localIdx?cur.sc.accent:(answers[cur.startIdx+qi]&&answers[cur.startIdx+qi].trim())?cur.sc.progress:"rgba(255,255,255,0.08)",transition:"all 0.3s",boxShadow:qi===localIdx?`0 0 8px ${cur.sc.glow}`:""}}/>
           ))}
         </div>
-        <span style={{fontSize:11,color:"rgba(255,255,255,0.35)",flexShrink:0,fontVariantNumeric:"tabular-nums"}}>{localIdx+1}/{cur.qs.length}</span>
+        <span style={{fontSize:11,color:"rgba(255,255,255,0.5)",flexShrink:0,fontVariantNumeric:"tabular-nums"}}>{localIdx+1}/{cur.qs.length}</span>
       </div>
     );
   }
@@ -278,20 +278,20 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, 
       <div className="glass-sidebar" style={style}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,padding:"0 4px"}}>
           <span style={{fontSize:13,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>題目列表</span>
-          {!isWide && <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.3)",padding:4}}><CloseIcon/></button>}
+          {!isWide && <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.5)",padding:4}}><CloseIcon/></button>}
         </div>
 
-        <button onClick={() => { onOverview(); if(!isWide) onClose(); }} style={{width:"100%",padding:"10px 12px",marginBottom:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"rgba(255,255,255,0.04)",fontSize:12,fontWeight:500,color:"rgba(255,255,255,0.6)",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:8}}>
+        <button onClick={() => { onOverview(); if(!isWide) onClose(); }} style={{width:"100%",padding:"10px 12px",marginBottom:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.08)",background:"rgba(255,255,255,0.04)",fontSize:12,fontWeight:500,color:"rgba(255,255,255,0.7)",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:8}}>
           <ListIcon/>
           <span style={{flex:1}}>查看總覽</span>
-          <span style={{fontSize:11,color:"rgba(255,255,255,0.3)",fontVariantNumeric:"tabular-nums"}}>{answeredCount}/{total}</span>
+          <span style={{fontSize:11,color:"rgba(255,255,255,0.5)",fontVariantNumeric:"tabular-nums"}}>{answeredCount}/{total}</span>
         </button>
 
         {sectionData.map(sd => (
           <div key={sd.sec} style={{marginBottom:14}}>
             <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 4px"}}>
               <span style={{...S.badge(sd.sc),width:20,height:20,fontSize:9,borderRadius:5}}>{sd.sc.badge}</span>
-              <span style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.35)"}}>{sd.sec}</span>
+              <span style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.55)"}}>{sd.sec}</span>
             </div>
             {sd.qs.map((q, qi) => {
               const idx = sd.startIdx + qi;
@@ -308,9 +308,9 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, 
                     flexShrink:0,width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
                     fontSize:10,fontWeight:700,
                     background:answered?sd.sc.light:current?"rgba(255,255,255,0.06)":"transparent",
-                    color:answered?sd.sc.dark:"rgba(255,255,255,0.25)",
+                    color:answered?sd.sc.dark:"rgba(255,255,255,0.4)",
                   }}>{answered ? <CheckIcon size={12} color={sd.sc.accent}/> : q.id}</span>
-                  <span style={{fontSize:12,color:current?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.4)",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
+                  <span style={{fontSize:12,color:current?"rgba(255,255,255,0.95)":"rgba(255,255,255,0.55)",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
                     {q.title.slice(0,18)}{q.title.length>18?"⋯":""}
                   </span>
                 </button>
@@ -399,12 +399,11 @@ function App() {
   const jumpTo = useCallback((i) => { setSlideDir(i > currentIndex ? "left" : "right"); setCurrentIndex(i); setCameFromOverview(showOverview || isComplete); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true); }, [currentIndex, showOverview, isComplete]);
 
   const cleanPrompt = (p) => p.replace(/[？？]$/, "");
-  const isPromptSelected = (p) => { const cur = answers[currentIndex] || ""; return cur.split("\n").some(l => l.trim() === cleanPrompt(p)); };
+  const isPromptSelected = (p) => { const cur = (answers[currentIndex] || "").trim(); return cur === cleanPrompt(p); };
   const handlePromptClick = (p) => {
-    const clean = cleanPrompt(p); const cur = answers[currentIndex] || "";
-    const lines = cur.split("\n").filter(l => l.trim()); const idx = lines.findIndex(l => l.trim() === clean);
-    if (idx >= 0) { lines.splice(idx, 1); setAnswers(prev => ({...prev, [currentIndex]: lines.join("\n")})); }
-    else { setAnswers(prev => ({...prev, [currentIndex]: lines.length ? lines.join("\n") + "\n" + clean : clean})); }
+    const clean = cleanPrompt(p);
+    if (isPromptSelected(p)) { setAnswers(prev => ({...prev, [currentIndex]: ""})); }
+    else { setAnswers(prev => ({...prev, [currentIndex]: clean})); }
   };
   const clearAnswer = () => { setAnswers(prev => { const next = {...prev}; delete next[currentIndex]; return next; }); };
 
@@ -431,7 +430,7 @@ function App() {
         <div style={{animation:"splashScale 1.5s cubic-bezier(0.22,1,0.36,1) forwards"}}>
           <div style={{width:72,height:72,borderRadius:20,background:"linear-gradient(135deg,#6366F1,#A855F7)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 60px rgba(99,102,241,0.4)"}}><VideoIcon/></div>
         </div>
-        <p style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginTop:20,fontWeight:500,animation:"fadeUp 0.8s 0.5s ease-out both"}}>環境部影片需求確認</p>
+        <p style={{color:"rgba(255,255,255,0.7)",fontSize:13,marginTop:20,fontWeight:500,animation:"fadeUp 0.8s 0.5s ease-out both"}}>環境部影片需求確認</p>
       </div>
     );
   }
@@ -443,12 +442,12 @@ function App() {
         <div className="glass anim-fade" style={{maxWidth:460,width:"100%",padding:32,textAlign:"center"}}>
           <div className="anim-glow" style={{width:56,height:56,borderRadius:16,background:"linear-gradient(135deg,#6366F1,#8B5CF6)",display:"inline-flex",alignItems:"center",justifyContent:"center",marginBottom:24,boxShadow:"0 0 40px rgba(99,102,241,0.3)"}}><VideoIcon/></div>
           <h1 style={{fontSize:22,fontWeight:700,color:"#fff",marginBottom:6}}>環境部影片需求確認</h1>
-          <p style={{color:"rgba(255,255,255,0.4)",fontSize:14,marginBottom:4}}>兩支影片 · 五大面向 · 共 {total} 題</p>
-          <p style={{color:"rgba(255,255,255,0.25)",fontSize:12,marginBottom:28}}>從整體方向到技術規格，一次確認到位</p>
+          <p style={{color:"rgba(255,255,255,0.7)",fontSize:14,marginBottom:4}}>兩支影片 · 五大面向 · 共 {total} 題</p>
+          <p style={{color:"rgba(255,255,255,0.5)",fontSize:12,marginBottom:28}}>從整體方向到技術規格，一次確認到位</p>
 
           <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:18,marginBottom:14,textAlign:"left",border:"1px solid rgba(255,255,255,0.06)"}}>
-            <p style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.7)",marginBottom:10}}>問卷架構</p>
-            <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:2.0}}>
+            <p style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.85)",marginBottom:10}}>問卷架構</p>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.7)",lineHeight:2.0}}>
               {[
                 {badge:"A",color:SC["A 整體背景"],text:"整體背景 — 場合、觀眾、時程、預算"},
                 {badge:"B",color:SC["B 開場影片"],text:"開場影片 — 歡樂氛圍、部長入鏡"},
@@ -464,10 +463,10 @@ function App() {
             </div>
           </div>
 
-          <div style={{background:"rgba(129,140,248,0.06)",borderRadius:14,padding:16,marginBottom:28,textAlign:"left",border:"1px solid rgba(129,140,248,0.1)"}}>
-            <p style={{fontSize:13,fontWeight:600,color:"#818CF8",marginBottom:8}}>填寫方式</p>
-            <div style={{fontSize:12,color:"rgba(129,140,248,0.7)",lineHeight:2.1}}>
-              <div>· 每題有快速選項，可多選、再點取消</div>
+          <div style={{background:"rgba(129,140,248,0.08)",borderRadius:14,padding:16,marginBottom:28,textAlign:"left",border:"1px solid rgba(129,140,248,0.15)"}}>
+            <p style={{fontSize:13,fontWeight:600,color:"#A5B4FC",marginBottom:8}}>填寫方式</p>
+            <div style={{fontSize:12,color:"rgba(200,210,255,0.85)",lineHeight:2.1}}>
+              <div>· 每題有快速選項，點選即填入</div>
               <div>· 標「已知」的題目只需確認是否正確</div>
               <div>· 不確定的可以跳過，左右滑動切換題目</div>
               <div>· 填到一半關掉也不會消失，自動保存</div>
@@ -478,7 +477,7 @@ function App() {
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
               <button onClick={() => setCurrentIndex(Math.min(lastAnswered + 1, total - 1))} style={{...S.btnPrimary,width:"100%",fontSize:15,padding:"16px 28px"}}>繼續填寫</button>
               <button onClick={() => { setShowOverview(true); }} style={{...S.btnSecondary,width:"100%",fontSize:14}}>修改回覆</button>
-              <p style={{color:"rgba(255,255,255,0.25)",fontSize:11,marginTop:2,textAlign:"center"}}>上次填了 {answeredCount}/{total} 題，進度已保存</p>
+              <p style={{color:"rgba(255,255,255,0.5)",fontSize:11,marginTop:2,textAlign:"center"}}>上次填了 {answeredCount}/{total} 題，進度已保存</p>
             </div>
           ) : (
             <button onClick={() => setCurrentIndex(0)} style={{...S.btnPrimary,width:"100%",padding:"16px 28px",fontSize:16}}>開始填寫</button>
@@ -505,13 +504,13 @@ function App() {
               <h2 style={{fontSize:19,fontWeight:700,color:"#fff"}}>{isComplete ? "確認完成！" : "問卷總覽"}</h2>
               {!isComplete && <button onClick={() => {setShowOverview(false);setIsComplete(false);}} style={{...S.btnText,fontSize:13,padding:"4px 8px",display:"flex",alignItems:"center",gap:2}}><CloseIcon/></button>}
             </div>
-            <p style={{color:"rgba(255,255,255,0.35)",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題 {answeredCount === total && " — 全部完成！"}</p>
+            <p style={{color:"rgba(255,255,255,0.55)",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題 {answeredCount === total && " — 全部完成！"}</p>
             <div style={{width:"100%",background:"rgba(255,255,255,0.06)",borderRadius:999,height:6,marginBottom:16}}>
               <div style={{background:answeredCount===total?"#10B981":"linear-gradient(90deg,#6366F1,#A855F7)",height:6,borderRadius:999,transition:"width 0.5s",width:(answeredCount/total*100)+"%",boxShadow:answeredCount===total?"0 0 12px rgba(16,185,129,0.4)":"0 0 12px rgba(99,102,241,0.3)"}}/>
             </div>
             <div style={{display:"flex",gap:6,marginBottom:16}}>
               {[["all","全部"],["unanswered","未填"],["answered","已填"]].map(([k,label]) => (
-                <button key={k} onClick={() => setOverviewFilter(k)} style={{padding:"5px 12px",borderRadius:8,fontSize:12,fontWeight:overviewFilter===k?600:400,border:"none",cursor:"pointer",background:overviewFilter===k?"rgba(255,255,255,0.12)":"rgba(255,255,255,0.04)",color:overviewFilter===k?"#fff":"rgba(255,255,255,0.35)"}}>{label}</button>
+                <button key={k} onClick={() => setOverviewFilter(k)} style={{padding:"5px 12px",borderRadius:8,fontSize:12,fontWeight:overviewFilter===k?600:400,border:"none",cursor:"pointer",background:overviewFilter===k?"rgba(255,255,255,0.15)":"rgba(255,255,255,0.04)",color:overviewFilter===k?"#fff":"rgba(255,255,255,0.5)"}}>{label}</button>
               ))}
             </div>
             <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:submitStatus==="submitting"?0.6:1,background:submitStatus==="success"?"linear-gradient(135deg,#059669,#10B981)":submitStatus==="error"?"linear-gradient(135deg,#DC2626,#EF4444)":"linear-gradient(135deg,#6366F1,#8B5CF6)"}}>
@@ -526,22 +525,22 @@ function App() {
             const isNew = q.section !== sec; if (isNew) sec = q.section;
             const c = SC[q.section]; const has = answers[i] && answers[i].trim();
             return (<div key={q.id}>
-              {isNew && <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}><span style={S.badge(c)}>{c.badge}</span><span style={{fontWeight:600,color:"rgba(255,255,255,0.6)",fontSize:13}}>{q.section}</span></div>}
+              {isNew && <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}><span style={S.badge(c)}>{c.badge}</span><span style={{fontWeight:600,color:"rgba(255,255,255,0.75)",fontSize:13}}>{q.section}</span></div>}
               <button onClick={() => jumpTo(i)} style={{width:"100%",textAlign:"left",borderRadius:14,padding:14,marginBottom:6,border:has?`1px solid ${c.confirmBorder}`:"1px solid rgba(255,255,255,0.04)",cursor:"pointer",background:has?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.02)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
                 <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
-                  <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(255,255,255,0.04)",color:has?c.dark:"rgba(255,255,255,0.25)"}}>{has?<CheckIcon size={14} color={c.accent}/>:q.id}</span>
+                  <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(255,255,255,0.06)",color:has?c.dark:"rgba(255,255,255,0.4)"}}>{has?<CheckIcon size={14} color={c.accent}/>:q.id}</span>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
-                      <span style={{fontSize:13,fontWeight:500,color:"rgba(255,255,255,0.8)"}}>{q.title}</span>
+                      <span style={{fontSize:13,fontWeight:500,color:"rgba(255,255,255,0.9)"}}>{q.title}</span>
                       {q.type==="confirm"&&<span style={S.pillBadge}>已知待確認</span>}
                     </div>
-                    {has?<p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:0,lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{answers[i]}</p>:<p style={{fontSize:12,color:"rgba(255,255,255,0.15)",fontStyle:"italic",margin:0}}>尚未填寫</p>}
+                    {has?<p style={{fontSize:12,color:"rgba(255,255,255,0.6)",margin:0,lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{answers[i]}</p>:<p style={{fontSize:12,color:"rgba(255,255,255,0.35)",fontStyle:"italic",margin:0}}>尚未填寫</p>}
                   </div>
                 </div>
               </button>
             </div>);
           })}
-          {filteredQs.length === 0 && <p style={{textAlign:"center",color:"rgba(255,255,255,0.25)",fontSize:13,padding:40}}>{overviewFilter==="unanswered"?"全部都填完了！":"還沒有填寫任何題目"}</p>}
+          {filteredQs.length === 0 && <p style={{textAlign:"center",color:"rgba(255,255,255,0.5)",fontSize:13,padding:40}}>{overviewFilter==="unanswered"?"全部都填完了！":"還沒有填寫任何題目"}</p>}
           <div style={{display:"flex",gap:10,marginTop:22,marginBottom:32}}>
             <button onClick={() => {setShowOverview(false);setIsComplete(false);setCurrentIndex(0);}} style={{...S.btnSecondary,flex:1}}>回到第一題</button>
             <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}><SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}</button>
@@ -562,7 +561,7 @@ function App() {
         {!isWide && <button onClick={() => setShowSidebar(true)} style={{...S.btnText,fontSize:13,padding:"6px 8px",display:"flex",alignItems:"center",gap:4}}><MenuIcon/></button>}
         {isWide && <button onClick={() => setShowOverview(true)} style={{...S.btnText,fontSize:13,padding:"6px 10px",display:"flex",alignItems:"center",gap:2}}><ChevronLeft/> 總覽</button>}
         <div style={{flex:1,margin:"0 8px"}}><Timeline currentIndex={currentIndex} answers={answers} isWide={isWide}/></div>
-        {isWide && <span style={{fontSize:12,color:"rgba(255,255,255,0.3)",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>}
+        {isWide && <span style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>}
       </div>
 
       <div style={{flex:1,display:"flex",overflow:"hidden"}}>
@@ -580,17 +579,17 @@ function App() {
 
             {currentQuestion.prefilled && (
               <div style={{padding:16,marginBottom:14,borderRadius:14,background:sc.confirmBg,border:`1px solid ${sc.confirmBorder}`}}>
-                <p style={{fontSize:11,color:"rgba(255,255,255,0.35)",marginBottom:4,fontWeight:500}}>目前掌握的資訊</p>
-                <p style={{fontSize:14,color:"rgba(255,255,255,0.75)",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
+                <p style={{fontSize:11,color:"rgba(255,255,255,0.55)",marginBottom:4,fontWeight:500}}>目前掌握的資訊</p>
+                <p style={{fontSize:14,color:"rgba(255,255,255,0.85)",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
               </div>
             )}
 
-            <p style={{color:"rgba(255,255,255,0.3)",fontSize:13,marginBottom:16}}>{currentQuestion.hint}</p>
+            <p style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginBottom:16}}>{currentQuestion.hint}</p>
 
             {currentQuestion.prompts && currentQuestion.prompts.length > 0 && (
               <div style={{marginBottom:16}}>
-                <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"rgba(255,255,255,0.3)",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
-                  <span>快速選擇（可多選）</span>
+                <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"rgba(255,255,255,0.5)",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
+                  <span>快速選擇</span>
                   <span style={{fontSize:9,transition:"transform 0.2s",transform:expandedPrompts?"rotate(180deg)":"rotate(0)"}}>&#9650;</span>
                 </button>
                 {expandedPrompts && (
@@ -598,7 +597,7 @@ function App() {
                     {currentQuestion.prompts.map((p,pi) => {
                       const selected = isPromptSelected(p);
                       return (
-                        <button key={pi} onClick={() => handlePromptClick(p)} className="anim-fade" style={{display:"flex",alignItems:"center",gap:10,width:"100%",textAlign:"left",fontSize:14,padding:"11px 14px",borderRadius:12,border:selected?`1.5px solid ${sc.accent}`:`1px solid ${sc.promptBorder}`,background:selected?sc.light:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:selected?(sc.dark||"#fff"):"rgba(255,255,255,0.6)",cursor:"pointer",lineHeight:1.5,fontWeight:selected?500:400,animationDelay:(pi*0.05)+"s",boxShadow:selected?`0 0 16px ${sc.glow}`:""}}>
+                        <button key={pi} onClick={() => handlePromptClick(p)} className="anim-fade" style={{display:"flex",alignItems:"center",gap:10,width:"100%",textAlign:"left",fontSize:14,padding:"11px 14px",borderRadius:12,border:selected?`1.5px solid ${sc.accent}`:`1px solid ${sc.promptBorder}`,background:selected?sc.light:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:selected?(sc.dark||"#fff"):"rgba(255,255,255,0.75)",cursor:"pointer",lineHeight:1.5,fontWeight:selected?500:400,animationDelay:(pi*0.05)+"s",boxShadow:selected?`0 0 16px ${sc.glow}`:""}}>
                           <span style={{flexShrink:0,width:20,height:20,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",background:selected?sc.accent:"rgba(255,255,255,0.06)",transition:"all 0.2s"}}>
                             {selected && <AnimCheck/>}
                           </span>
@@ -614,7 +613,7 @@ function App() {
             <div style={{position:"relative"}}>
               <textarea ref={textareaRef} value={curAnswer} onChange={e => setAnswers(prev => ({...prev,[currentIndex]:e.target.value}))} placeholder={currentQuestion.type==="confirm"?"請確認或說明需調整之處⋯":"請輸入您的回覆⋯"} style={{...S.textarea,"::placeholder":{color:"rgba(255,255,255,0.2)"}}} rows={3}/>
               {curAnswer.trim() && (
-                <button onClick={clearAnswer} title="清除此題回答" style={{position:"absolute",top:10,right:10,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"rgba(255,255,255,0.25)",display:"flex"}}>
+                <button onClick={clearAnswer} title="清除此題回答" style={{position:"absolute",top:10,right:10,background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"rgba(255,255,255,0.4)",display:"flex"}}>
                   <TrashIcon/>
                 </button>
               )}
@@ -626,7 +625,7 @@ function App() {
       <div className="glass-bar" style={{borderTop:"1px solid rgba(255,255,255,0.04)",padding:"10px 16px",position:"sticky",bottom:0,zIndex:50}}>
         <div className="safe-bottom" style={{maxWidth:520,margin:"0 auto",display:"flex",alignItems:"center",gap:6}}>
           <button onClick={goPrev} disabled={isFirst} style={{...S.btnText,display:"flex",alignItems:"center",gap:2,opacity:isFirst?0.2:1}}><ChevronLeft/> {isFirst?"歡迎頁":"上一題"}</button>
-          <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"rgba(255,255,255,0.15)"}}>跳過</button>
+          <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"rgba(255,255,255,0.35)"}}>跳過</button>
           <div style={{flex:1}}/>
           {cameFromOverview && (
             <button onClick={() => { setCameFromOverview(false); setShowOverview(true); }} style={{...S.btnSecondary,display:"flex",alignItems:"center",gap:4,padding:"12px 18px",fontSize:13}}>
