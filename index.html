@@ -113,15 +113,15 @@ button:active{transform:scale(0.96)}
 <script type="text/babel">
 const {useState,useRef,useEffect,useCallback,useMemo} = React;
 
-const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQU97_ZCoBzm6yAZymP-rECJTxZ4BfaGpj07IyqSv7ZW-GAErikF3wKBXwpo2deRsn/exec";
+const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-D28sopw6kyZcMiGm4n5IW1C8snnUUvXU31GVkuEmTcRO2_RHPMAffngIE9viMN8WMw/exec";
 
 const questions = [
   /* ═══ A: 整體背景（先搞清楚大方向）═══ */
   {id:1,section:"A 整體背景",type:"open",title:"這兩支影片會在什麼場合播放？",prefilled:"",hint:"在什麼場地、什麼時機",prompts:["活動現場大螢幕","也會放到網路上（YouTube、社群等）","只在活動現場播，不對外公開","活動後也會用於其他場合（記者會、內部報告等）"]},
   {id:2,section:"A 整體背景",type:"open",title:"現場觀眾主要是哪些人？",prefilled:"",hint:"知道觀眾是誰，影片的語氣和節奏才能對味",prompts:["環境部內部同仁","各縣市環保局代表","民意代表 / 議員","媒體記者","一般民眾 / 里長 / 社區代表","以上好幾種混合（請說明）"]},
-  {id:3,section:"A 整體背景",type:"open",title:"活動日期大概什麼時候？我需要多少時間製作？",prefilled:"",hint:"讓我排出合理的製作時程",prompts:["活動在 ___ 月（請語音說出）","希望在 ___ 前完成","時間很趕，需要盡快啟動","時間充裕，慢慢來沒關係"]},
-  {id:4,section:"A 整體背景",type:"open",title:"預算範圍大概在哪裡？",prefilled:"",hint:"方便我規劃製作規模",prompts:["有明確預算（請語音說出金額區間）","預算待確認，但希望控制在合理範圍","這題之後再談"]},
-  {id:5,section:"A 整體背景",type:"open",title:"有沒有你看過覺得「就是這種感覺」的影片？",prefilled:"",hint:"一個參考影片，比講一百句形容詞都有用",prompts:["有，我之後傳連結給你","某個政府宣傳片我很喜歡（請語音描述）","某個品牌廣告的感覺很接近（請語音描述）","沒有特別的參考"]},
+  {id:3,section:"A 整體背景",type:"open",title:"活動日期大概什麼時候？我需要多少時間製作？",prefilled:"",hint:"讓我排出合理的製作時程",prompts:["活動在 ___ 月（請填入）","希望在 ___ 前完成","時間很趕，需要盡快啟動","時間充裕，慢慢來沒關係"]},
+  {id:4,section:"A 整體背景",type:"open",title:"預算範圍大概在哪裡？",prefilled:"",hint:"方便我規劃製作規模",prompts:["有明確預算（請填入金額區間）","預算待確認，但希望控制在合理範圍","這題之後再談"]},
+  {id:5,section:"A 整體背景",type:"open",title:"有沒有你看過覺得「就是這種感覺」的影片？",prefilled:"",hint:"一個參考影片，比講一百句形容詞都有用",prompts:["有，我之後傳連結給你","某個政府宣傳片我很喜歡（請描述）","某個品牌廣告的感覺很接近（請描述）","沒有特別的參考"]},
   {id:6,section:"A 整體背景",type:"open",title:"有沒有絕對不能出現的東西？",prefilled:"",hint:"風格、畫面、用詞的地雷區",prompts:["不要太像選舉宣傳片","不要出現特定政治人物或標語","不要太兒戲，畢竟是政府活動","目前沒有特別的禁忌"]},
 
   /* ═══ B: 開場影片（約 2 分鐘）═══ */
@@ -136,7 +136,7 @@ const questions = [
 
   /* ═══ C: 影片 B — 1999 整合介紹 ═══ */
   {id:15,section:"C 1999 整合",type:"confirm",title:"影片 B 的核心訊息，我理解是：",prefilled:"以前民眾要打很多不同號碼處理不同問題，現在整合成 1999 一支電話就能處理",hint:"這樣理解對嗎？有沒有要修正",prompts:["對，核心就是「多線合一」","對，但要強調「不只是電話整合，是服務升級」","方向對，但還要加上⋯"]},
-  {id:16,section:"C 1999 整合",type:"open",title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請語音說明）"]},
+  {id:16,section:"C 1999 整合",type:"open",title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請說明）"]},
   {id:17,section:"C 1999 整合",type:"confirm",title:"您提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
   {id:18,section:"C 1999 整合",type:"confirm",title:"您提到想用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
   {id:19,section:"C 1999 整合",type:"open",title:"一鏡到底的畫面，你心中的場景是怎樣走的？",prefilled:"",hint:"想像鏡頭從哪裡開始、經過哪裡、在哪裡結束",prompts:["從民眾遇到問題開始 → 撥打 1999 → 問題被處理","從辦公室接線場景 → 走到戶外各種服務現場","從以前（分散打電話）→ 過渡到現在（一通搞定）","從 1999 電話 → 延伸到 LINE → 到其他管道","我沒有具體想法，交給你發想"]},
@@ -351,6 +351,7 @@ function App() {
   const [toastKey, setToastKey] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [overviewFilter, setOverviewFilter] = useState("all");
+  const [cameFromOverview, setCameFromOverview] = useState(false);
   const submittingRef = useRef(false);
   const textareaRef = useRef(null);
   const contentRef = useRef(null);
@@ -364,7 +365,7 @@ function App() {
 
   useEffect(() => {
     if (currentIndex >= 0) {
-      setTimeout(() => { if(textareaRef.current) textareaRef.current.focus(); }, 150);
+      if (isWide) setTimeout(() => { if(textareaRef.current) textareaRef.current.focus(); }, 150);
       if (contentRef.current) contentRef.current.scrollTop = 0;
     }
   }, [currentIndex]);
@@ -383,6 +384,7 @@ function App() {
         if (currentIndex >= 0 && Object.keys(answers).length > 0) { setToastMsg("已自動保存"); setToastKey(k => k + 1); }
       } catch(e) {}
     }, 800);
+    if (submitStatus === "success") setSubmitStatus("idle");
   }, [answers]);
 
   const total = questions.length;
@@ -394,7 +396,7 @@ function App() {
 
   const goNext = useCallback(() => { setSlideDir("left"); if (currentIndex < total - 1) { setCurrentIndex(currentIndex + 1); setExpandedPrompts(true); } else { setIsComplete(true); } }, [currentIndex, total]);
   const goPrev = useCallback(() => { setSlideDir("right"); if (currentIndex > 0) { setCurrentIndex(currentIndex - 1); setExpandedPrompts(true); } else if (currentIndex === 0) { setCurrentIndex(-1); } }, [currentIndex]);
-  const jumpTo = useCallback((i) => { setSlideDir(i > currentIndex ? "left" : "right"); setCurrentIndex(i); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true); }, [currentIndex]);
+  const jumpTo = useCallback((i) => { setSlideDir(i > currentIndex ? "left" : "right"); setCurrentIndex(i); setCameFromOverview(showOverview || isComplete); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true); }, [currentIndex, showOverview, isComplete]);
 
   const cleanPrompt = (p) => p.replace(/[？？]$/, "");
   const isPromptSelected = (p) => { const cur = answers[currentIndex] || ""; return cur.split("\n").some(l => l.trim() === cleanPrompt(p)); };
@@ -403,7 +405,6 @@ function App() {
     const lines = cur.split("\n").filter(l => l.trim()); const idx = lines.findIndex(l => l.trim() === clean);
     if (idx >= 0) { lines.splice(idx, 1); setAnswers(prev => ({...prev, [currentIndex]: lines.join("\n")})); }
     else { setAnswers(prev => ({...prev, [currentIndex]: lines.length ? lines.join("\n") + "\n" + clean : clean})); }
-    if (textareaRef.current) textareaRef.current.focus();
   };
   const clearAnswer = () => { setAnswers(prev => { const next = {...prev}; delete next[currentIndex]; return next; }); };
 
@@ -466,7 +467,6 @@ function App() {
           <div style={{background:"rgba(129,140,248,0.06)",borderRadius:14,padding:16,marginBottom:28,textAlign:"left",border:"1px solid rgba(129,140,248,0.1)"}}>
             <p style={{fontSize:13,fontWeight:600,color:"#818CF8",marginBottom:8}}>填寫方式</p>
             <div style={{fontSize:12,color:"rgba(129,140,248,0.7)",lineHeight:2.1}}>
-              <div>· 支援語音輸入，直接對手機說就好</div>
               <div>· 每題有快速選項，可多選、再點取消</div>
               <div>· 標「已知」的題目只需確認是否正確</div>
               <div>· 不確定的可以跳過，左右滑動切換題目</div>
@@ -628,6 +628,11 @@ function App() {
           <button onClick={goPrev} disabled={isFirst} style={{...S.btnText,display:"flex",alignItems:"center",gap:2,opacity:isFirst?0.2:1}}><ChevronLeft/> {isFirst?"歡迎頁":"上一題"}</button>
           <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"rgba(255,255,255,0.15)"}}>跳過</button>
           <div style={{flex:1}}/>
+          {cameFromOverview && (
+            <button onClick={() => { setCameFromOverview(false); setShowOverview(true); }} style={{...S.btnSecondary,display:"flex",alignItems:"center",gap:4,padding:"12px 18px",fontSize:13}}>
+              <ListIcon/> 返回總覽送出
+            </button>
+          )}
           <button onClick={goNext} style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:4,minWidth:isLast?100:undefined,justifyContent:"center",padding:"12px 24px"}}>
             {isLast?(<><CheckIcon size={16} color="#fff"/> 完成</>):(<>下一題 <ChevronRight/></>)}
           </button>
