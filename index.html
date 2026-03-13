@@ -355,6 +355,14 @@ function App() {
   const submittingRef = useRef(false);
   const textareaRef = useRef(null);
   const contentRef = useRef(null);
+  const saveTimerRef = useRef(null);
+
+  /* ═══ Answer helpers (must be before hooks that use them) ═══ */
+  const total = questions.length;
+  const getAns = useCallback((idx) => { const a = answers[idx]; if (!a) return {selected:"",note:""}; if (typeof a === "string") return {selected:a,note:""}; return a; }, [answers]);
+  const hasAns = useCallback((idx) => { const a = getAns(idx); return !!(a.selected?.trim() || a.note?.trim()); }, [getAns]);
+  const ansText = useCallback((idx) => { const a = getAns(idx); let p=[]; if(a.selected?.trim()) p.push(a.selected.trim()); if(a.note?.trim()) p.push("【補充】"+a.note.trim()); return p.join("\n"); }, [getAns]);
+  const answeredCount = useMemo(() => Object.keys(answers).filter(k => hasAns(Number(k))).length, [answers, hasAns]);
 
   useAutoResize(textareaRef, currentIndex >= 0 ? getAns(currentIndex).note : "");
 
@@ -381,7 +389,6 @@ function App() {
       }
     } catch(e) { localStorage.removeItem("env_video_answers"); }
   }, []);
-  const saveTimerRef = useRef(null);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
@@ -391,12 +398,6 @@ function App() {
     }, 800);
     if (submitStatus === "success") setSubmitStatus("idle");
   }, [answers]);
-
-  const total = questions.length;
-  const getAns = useCallback((idx) => { const a = answers[idx]; if (!a) return {selected:"",note:""}; if (typeof a === "string") return {selected:a,note:""}; return a; }, [answers]);
-  const hasAns = useCallback((idx) => { const a = getAns(idx); return !!(a.selected?.trim() || a.note?.trim()); }, [getAns]);
-  const ansText = useCallback((idx) => { const a = getAns(idx); let p=[]; if(a.selected?.trim()) p.push(a.selected.trim()); if(a.note?.trim()) p.push("【補充】"+a.note.trim()); return p.join("\n"); }, [getAns]);
-  const answeredCount = useMemo(() => Object.keys(answers).filter(k => hasAns(Number(k))).length, [answers, hasAns]);
   const currentQuestion = currentIndex >= 0 ? questions[currentIndex] : null;
   const sc = currentQuestion ? SC[currentQuestion.section] : null;
   const hasResume = useMemo(() => answeredCount > 0, [answeredCount]);
