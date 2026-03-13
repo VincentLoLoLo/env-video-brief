@@ -66,8 +66,8 @@ const questions = [
   {id:8,section:"影片 A：開場影片（約 2 分鐘）",type:"open",title:"開場影片播完後，觀眾理想的反應是？",prefilled:"",hint:"播完那一刻，你希望看到什麼場景",prompts:["大家鼓掌笑著，氣氛很好","觀眾很期待接下來的報告內容","現場有種「哇，環境部不一樣了」的感覺","觀眾開始拿手機拍照或錄影分享"]},
   {id:9,section:"影片 B：1999 整合介紹",type:"confirm",title:"影片 B 的核心訊息，我理解是：",prefilled:"以前民眾要打很多不同號碼處理不同問題，現在整合成 1999 一支電話就能處理",hint:"這樣理解對嗎？有沒有要修正",prompts:["對，核心就是「多線合一」","對，但要強調「不只是電話整合，是服務升級」","方向對，但還要加上⋯"]},
   {id:10,section:"影片 B：1999 整合介紹",type:"open",title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請語音說明）"]},
-  {id:11,section:"影片 B：1999 整合介紹",type:"confirm",title:"副總提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
-  {id:12,section:"影片 B：1999 整合介紹",type:"confirm",title:"副總提到想用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
+  {id:11,section:"影片 B：1999 整合介紹",type:"confirm",title:"您提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
+  {id:12,section:"影片 B：1999 整合介紹",type:"confirm",title:"您提到想用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
   {id:13,section:"影片 B：1999 整合介紹",type:"open",title:"一鏡到底的畫面，你心中的場景是怎樣走的？",prefilled:"",hint:"想像鏡頭從哪裡開始、經過哪裡、在哪裡結束",prompts:["從民眾遇到問題開始 → 撥打 1999 → 問題被處理","從辦公室接線場景 → 走到戶外各種服務現場","從以前（分散打電話）→ 過渡到現在（一通搞定）","從 1999 電話 → 延伸到 LINE → 到其他管道","我沒有具體想法，交給製作團隊發想"]},
   {id:14,section:"影片 B：1999 整合介紹",type:"open",title:"影片 B 大概多長？",prefilled:"",hint:"有沒有時間限制",prompts:["2 分鐘以內","3 分鐘左右","5 分鐘以內都可以","沒有特別限制，看內容需要"]},
   {id:15,section:"影片 B：1999 整合介紹",type:"open",title:"影片 B 的整體風格要什麼感覺？",prefilled:"",hint:"跟開場影片是同風格還是不同",prompts:["跟開場一樣歡樂活潑","比開場稍微正式一點，但不要太嚴肅","專業清晰，像一支好的說明影片","溫暖感人路線，讓人覺得政府在進步"]},
@@ -90,6 +90,13 @@ const SC = {
 
 const sections = ["影片 A：開場影片（約 2 分鐘）","影片 B：1999 整合介紹","整體 & 補充"];
 
+/* Precomputed section data to avoid repeated filter/findIndex */
+const sectionData = sections.map(sec => {
+  const qs = questions.filter(q => q.section === sec);
+  const startIdx = questions.findIndex(q => q.section === sec);
+  return { sec, qs, startIdx, sc: SC[sec] };
+});
+
 const S = {
   badge:(sc)=>({display:"inline-flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:8,background:sc.light,color:sc.dark,fontSize:13,fontWeight:700}),
   pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(59,130,246,0.08)",color:"#2563EB",fontSize:11,fontWeight:600},
@@ -108,33 +115,44 @@ const SendIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="no
 const MenuIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>);
 
 /* ═══ Timeline (top progress) ═══ */
-function Timeline({currentIndex, answers}) {
+function Timeline({currentIndex, answers, isWide}) {
+  if (!isWide) {
+    const cur = sectionData.find(s => currentIndex >= s.startIdx && currentIndex < s.startIdx + s.qs.length);
+    if (!cur) return null;
+    const localIdx = currentIndex - cur.startIdx;
+    return (
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 12px"}}>
+        <span style={{fontSize:11,fontWeight:600,color:cur.sc.dark,background:cur.sc.light,padding:"2px 8px",borderRadius:6,flexShrink:0}}>{cur.sc.badge}</span>
+        <div style={{flex:1,display:"flex",gap:2}}>
+          {cur.qs.map((q, qi) => (
+            <div key={qi} style={{flex:1,height:qi===localIdx?5:3,borderRadius:3,background:qi===localIdx?cur.sc.accent:(answers[cur.startIdx+qi]&&answers[cur.startIdx+qi].trim())?cur.sc.progress:"rgba(0,0,0,0.08)",transition:"all 0.3s"}}/>
+          ))}
+        </div>
+        <span style={{fontSize:11,color:"#94A3B8",flexShrink:0}}>{localIdx+1}/{cur.qs.length}</span>
+      </div>
+    );
+  }
   return (
     <div style={{display:"flex",gap:2,padding:"6px 12px",alignItems:"center"}}>
-      {sections.map((sec, si) => {
-        const sc = SC[sec];
-        const qs = questions.filter(q => q.section === sec);
-        const startIdx = questions.findIndex(q => q.section === sec);
-        return (
-          <React.Fragment key={si}>
-            {si > 0 && <div style={{width:1,height:10,background:"rgba(0,0,0,0.08)",flexShrink:0}}/>}
-            <div style={{display:"flex",gap:1,flex:qs.length}}>
-              {qs.map((q, qi) => {
-                const idx = startIdx + qi;
-                const answered = answers[idx] && answers[idx].trim();
-                const current = idx === currentIndex;
-                return <div key={idx} style={{flex:1,height:current?6:4,borderRadius:3,background:current?sc.accent:answered?sc.progress:"rgba(0,0,0,0.06)",transition:"all 0.3s",opacity:answered&&!current?0.6:1}}/>;
-              })}
-            </div>
-          </React.Fragment>
-        );
-      })}
+      {sectionData.map((sd, si) => (
+        <React.Fragment key={si}>
+          {si > 0 && <div style={{width:1,height:10,background:"rgba(0,0,0,0.08)",flexShrink:0}}/>}
+          <div style={{display:"flex",gap:1,flex:sd.qs.length}}>
+            {sd.qs.map((q, qi) => {
+              const idx = sd.startIdx + qi;
+              const answered = answers[idx] && answers[idx].trim();
+              const current = idx === currentIndex;
+              return <div key={idx} style={{flex:1,height:current?6:4,borderRadius:3,background:current?sd.sc.accent:answered?sd.sc.progress:"rgba(0,0,0,0.06)",transition:"all 0.3s",opacity:answered&&!current?0.6:1}}/>;
+            })}
+          </div>
+        </React.Fragment>
+      ))}
     </div>
   );
 }
 
 /* ═══ Sidebar ═══ */
-function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose}) {
+function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, onOverview}) {
   if (!isWide && !showMobile) return null;
   const style = isWide
     ? {width:260,flexShrink:0,overflowY:"auto",padding:"16px 12px"}
@@ -148,18 +166,18 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose})
           題目列表
           {!isWide && <button onClick={onClose} style={{float:"right",background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#94A3B8"}}>✕</button>}
         </div>
-        {sections.map(sec => {
-          const sc = SC[sec];
-          const qs = questions.filter(q => q.section === sec);
-          const startIdx = questions.findIndex(q => q.section === sec);
+        {!isWide && <button onClick={() => { onOverview(); onClose(); }} style={{width:"100%",padding:"8px 10px",marginBottom:10,borderRadius:8,border:"0.5px solid rgba(0,0,0,0.06)",background:"rgba(255,255,255,0.5)",fontSize:12,fontWeight:500,color:"#475569",cursor:"pointer",textAlign:"left"}}>
+          <CheckIcon/> 查看總覽 · 已填 {Object.keys(answers).filter(k=>answers[k]&&answers[k].trim()).length}/{questions.length}
+        </button>}
+        {sectionData.map(sd => {
           return (
-            <div key={sec} style={{marginBottom:14}}>
+            <div key={sd.sec} style={{marginBottom:14}}>
               <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 4px"}}>
-                <span style={{...S.badge(sc),width:20,height:20,fontSize:9,borderRadius:5}}>{sc.badge}</span>
-                <span style={{fontSize:11,fontWeight:600,color:"#64748B"}}>{sec.split("：")[0]}</span>
+                <span style={{...S.badge(sd.sc),width:20,height:20,fontSize:9,borderRadius:5}}>{sd.sc.badge}</span>
+                <span style={{fontSize:11,fontWeight:600,color:"#64748B"}}>{sd.sec.split("：")[0]}</span>
               </div>
-              {qs.map((q, qi) => {
-                const idx = startIdx + qi;
+              {sd.qs.map((q, qi) => {
+                const idx = sd.startIdx + qi;
                 const answered = answers[idx] && answers[idx].trim();
                 const current = idx === currentIndex;
                 return (
@@ -168,18 +186,18 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose})
                     padding:"7px 8px",borderRadius:8,marginBottom:2,border:"none",cursor:"pointer",
                     background:current?"rgba(15,23,42,0.06)":"transparent",
                     transition:"all 0.15s",
-                    borderLeft:current?"3px solid "+sc.accent:"3px solid transparent",
+                    borderLeft:current?"3px solid "+sd.sc.accent:"3px solid transparent",
                   }}>
                     <span style={{
                       flexShrink:0,width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:10,fontWeight:700,
-                      background:answered?sc.light:current?"rgba(0,0,0,0.04)":"transparent",
-                      color:answered?sc.dark:"#94A3B8",
+                      background:answered?sd.sc.light:current?"rgba(0,0,0,0.04)":"transparent",
+                      color:answered?sd.sc.dark:"#94A3B8",
                     }}>{q.id}</span>
                     <span style={{fontSize:12,color:current?"#0F172A":"#64748B",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
                       {q.title.slice(0,18)}{q.title.length>18?"⋯":""}
                     </span>
-                    {answered && <span style={{flexShrink:0,width:6,height:6,borderRadius:"50%",background:sc.progress}}/>}
+                    {answered && <span style={{flexShrink:0,width:6,height:6,borderRadius:"50%",background:sd.sc.progress}}/>}
                   </button>
                 );
               })}
@@ -217,8 +235,12 @@ function App() {
   useEffect(() => {
     try { const s = localStorage.getItem("env_video_answers"); if (s) setAnswers(JSON.parse(s)); } catch(e) {}
   }, []);
+  const saveTimerRef = useRef(null);
   useEffect(() => {
-    try { localStorage.setItem("env_video_answers", JSON.stringify(answers)); } catch(e) {}
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      try { localStorage.setItem("env_video_answers", JSON.stringify(answers)); } catch(e) {}
+    }, 500);
   }, [answers]);
 
   const total = questions.length;
@@ -241,13 +263,18 @@ function App() {
     if (!SHEET_SCRIPT_URL || submittingRef.current) return;
     submittingRef.current = true;
     setSubmitStatus("submitting");
-    const payload = JSON.stringify({timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>answers[i]||"（未填寫）")});
-    let iframe = document.getElementById("sheet-submit-frame");
-    if (!iframe) { iframe = document.createElement("iframe"); iframe.id="sheet-submit-frame"; iframe.name="sheet-submit"; iframe.style.display="none"; document.body.appendChild(iframe); }
-    const form = document.createElement("form"); form.method="POST"; form.action=SHEET_SCRIPT_URL; form.target="sheet-submit";
-    const input = document.createElement("input"); input.type="hidden"; input.name="data"; input.value=payload;
-    form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
-    setTimeout(() => { setSubmitStatus("success"); }, 2500);
+    try {
+      const payload = JSON.stringify({timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>answers[i]||"（未填寫）")});
+      let iframe = document.getElementById("sheet-submit-frame");
+      if (!iframe) { iframe = document.createElement("iframe"); iframe.id="sheet-submit-frame"; iframe.name="sheet-submit"; iframe.style.display="none"; document.body.appendChild(iframe); }
+      const form = document.createElement("form"); form.method="POST"; form.action=SHEET_SCRIPT_URL; form.target="sheet-submit";
+      const input = document.createElement("input"); input.type="hidden"; input.name="data"; input.value=payload;
+      form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+      setTimeout(() => { setSubmitStatus("success"); submittingRef.current = false; }, 2500);
+    } catch(err) {
+      setSubmitStatus("error");
+      submittingRef.current = false;
+    }
   };
 
   /* ═══ Welcome ═══ */
@@ -340,17 +367,17 @@ function App() {
       <div className="glass-bar" style={{padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"0.5px solid rgba(0,0,0,0.04)"}}>
         {!isWide && <button onClick={() => setShowSidebar(true)} style={{...S.btnText,fontSize:13,padding:"6px 8px",display:"flex",alignItems:"center",gap:4}}><MenuIcon/></button>}
         {isWide && <button onClick={() => setShowOverview(true)} style={{...S.btnText,fontSize:13,padding:"6px 10px",display:"flex",alignItems:"center",gap:2}}><ChevronLeft/> 總覽</button>}
-        <div style={{flex:1,margin:"0 8px"}}><Timeline currentIndex={currentIndex} answers={answers}/></div>
-        <span style={{fontSize:12,color:"#94A3B8",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>
+        <div style={{flex:1,margin:"0 8px"}}><Timeline currentIndex={currentIndex} answers={answers} isWide={isWide}/></div>
+        {isWide && <span style={{fontSize:12,color:"#94A3B8",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>}
       </div>
 
       {/* Main area with sidebar */}
       <div style={{flex:1,display:"flex",overflow:"hidden"}}>
         {/* Desktop sidebar */}
-        {isWide && <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={true} showMobile={false} onClose={()=>{}}/>}
+        {isWide && <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={true} showMobile={false} onClose={()=>{}} onOverview={()=>setShowOverview(true)}/>}
 
         {/* Mobile sidebar (drawer) */}
-        <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={false} showMobile={showSidebar} onClose={() => setShowSidebar(false)}/>
+        <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={false} showMobile={showSidebar} onClose={() => setShowSidebar(false)} onOverview={()=>setShowOverview(true)}/>
 
         {/* Question content */}
         <div style={{flex:1,overflowY:"auto",padding:"24px 16px"}} className="animate-in" key={currentIndex}>
@@ -410,7 +437,7 @@ function App() {
   );
 }
 
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
