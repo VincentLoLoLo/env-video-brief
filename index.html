@@ -62,8 +62,8 @@ const questions = [
   {id:8,section:"影片 A：開場影片（約 2 分鐘）",type:"open",title:"開場影片播完後，觀眾理想的反應是？",prefilled:"",hint:"播完那一刻，你希望看到什麼場景",prompts:["大家鼓掌笑著，氣氛很好","觀眾很期待接下來的報告內容","現場有種「哇，環境部不一樣了」的感覺","觀眾開始拿手機拍照或錄影分享"]},
   {id:9,section:"影片 B：1999 整合介紹",type:"confirm",title:"影片 B 的核心訊息，我們理解是：",prefilled:"以前民眾要打很多不同號碼處理不同問題，現在整合成 1999 一支電話就能處理",hint:"這樣理解對嗎？有沒有要修正",prompts:["對，核心就是「多線合一」","對，但要強調「不只是電話整合，是服務升級」","方向對，但還要加上⋯"]},
   {id:10,section:"影片 B：1999 整合介紹",type:"open",title:"具體有哪些服務被整合進 1999 了？",prefilled:"",hint:"盡量列出你記得的，之後可以再補",prompts:["資源回收相關","垃圾車班表 / 清運服務","環境陳情 / 通報（噪音、空汙等）","其他民生環境服務（請語音說明）"]},
-  {id:11,section:"影片 B：1999 整合介紹",type:"confirm",title:"副總提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請副總列出"]},
-  {id:12,section:"影片 B：1999 整合介紹",type:"confirm",title:"副總想要用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
+  {id:11,section:"影片 B：1999 整合介紹",type:"confirm",title:"之前提到除了 1999 電話，也要介紹 LINE 等其他管道？",prefilled:"影片後半段要帶出：除了 1999 專線，還有 LINE 及其他數位管道可以使用",hint:"有哪些管道要被提到",prompts:["1999 電話 ＋ LINE 官方帳號","還有 APP 或網站","還有 Facebook / 社群媒體","我不確定全部有哪些，請列出"]},
+  {id:12,section:"影片 B：1999 整合介紹",type:"confirm",title:"之前提到想用「一鏡到底」的方式來呈現影片 B？",prefilled:"影片 B 用一鏡到底的手法，從頭到尾不剪接、一氣呵成地介紹",hint:"確認一下這個想法",prompts:["對，就是要一鏡到底的感覺","不一定要真的一鏡到底，但要有那種流暢連貫感","我記錯了，不是一鏡到底，是⋯"]},
   {id:13,section:"影片 B：1999 整合介紹",type:"open",title:"一鏡到底的畫面，你心中的場景是怎樣走的？",prefilled:"",hint:"想像鏡頭從哪裡開始、經過哪裡、在哪裡結束",prompts:["從民眾遇到問題開始 → 撥打 1999 → 問題被處理","從辦公室接線場景 → 走到戶外各種服務現場","從以前（分散打電話）→ 過渡到現在（一通搞定）","從 1999 電話 → 延伸到 LINE → 到其他管道","我沒有具體想法，交給製作團隊發想"]},
   {id:14,section:"影片 B：1999 整合介紹",type:"open",title:"影片 B 大概多長？",prefilled:"",hint:"有沒有時間限制",prompts:["2 分鐘以內","3 分鐘左右","5 分鐘以內都可以","沒有特別限制，看內容需要"]},
   {id:15,section:"影片 B：1999 整合介紹",type:"open",title:"影片 B 的整體風格要什麼感覺？",prefilled:"",hint:"跟開場影片是同風格還是不同",prompts:["跟開場一樣歡樂活潑","比開場稍微正式一點，但不要太嚴肅","專業清晰，像一支好的說明影片","溫暖感人路線，讓人覺得政府在進步"]},
@@ -208,7 +208,7 @@ function App() {
           </div>
           <h1 style={{fontSize:21,fontWeight:700,color:"#0F172A",marginBottom:6,letterSpacing:"-0.01em"}}>環境部影片需求確認</h1>
           <p style={{color:"#94A3B8",fontSize:14,marginBottom:4}}>兩支影片 · 共 {total} 題</p>
-          <p style={{color:"#CBD5E1",fontSize:12,marginBottom:24}}>VV 團隊已整理目前掌握的資訊，請您確認與補充</p>
+          <p style={{color:"#CBD5E1",fontSize:12,marginBottom:24}}>我們已整理目前掌握的資訊，請您確認與補充</p>
 
           <div style={{background:"rgba(255,255,255,0.5)",borderRadius:12,padding:18,marginBottom:14,textAlign:"left",border:"0.5px solid rgba(0,0,0,0.04)"}}>
             <p style={{fontSize:13,fontWeight:600,color:"#334155",marginBottom:10}}>已掌握的資訊</p>
@@ -248,7 +248,7 @@ function App() {
         <div style={{maxWidth:600,margin:"0 auto"}}>
           <div className="glass animate-in" style={{padding:24,marginBottom:16}}>
             <h2 style={{fontSize:19,fontWeight:700,color:"#0F172A",marginBottom:4}}>
-              {isComplete ? "確認完成！感謝副總" : "問卷總覽"}
+              {isComplete ? "確認完成！感謝您的回覆" : "問卷總覽"}
             </h2>
             <p style={{color:"#94A3B8",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題</p>
             <div style={{width:"100%",background:"rgba(0,0,0,0.04)",borderRadius:999,height:6,marginBottom:20}}>
@@ -262,7 +262,7 @@ function App() {
               {submitStatus==="success" && "已成功送出"}
               {submitStatus==="error" && "送出失敗，點此重試"}
             </button>
-            {submitStatus==="success" && <p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已送達，感謝副總！</p>}
+            {submitStatus==="success" && <p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已成功送出！</p>}
           </div>
 
           {questions.map((q, i) => {
