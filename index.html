@@ -11,54 +11,105 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 <style>
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;margin:0;padding:0}
+
+/* ═══ Animated gradient background ═══ */
 body{
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;
   min-height:100vh;min-height:100dvh;
-  background:#E8ECF4;
-  background-image:
-    radial-gradient(ellipse at 15% 20%,rgba(99,102,241,0.10),transparent 50%),
-    radial-gradient(ellipse at 85% 80%,rgba(168,85,247,0.07),transparent 50%),
-    radial-gradient(ellipse at 50% 5%,rgba(59,130,246,0.06),transparent 45%);
-  background-attachment:fixed;
+  background:#0c0f1a;
+  overflow-x:hidden;
   overscroll-behavior:none;
 }
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#root{position:relative;z-index:1}
+
 textarea{font-family:inherit}
+
+/* ═══ Glass effects ═══ */
 .glass{
-  background:rgba(255,255,255,0.72);
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  border:0.5px solid rgba(255,255,255,0.6);
-  box-shadow:0 4px 24px rgba(0,0,0,0.06);
-  border-radius:16px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 8px 32px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.08);
+  border-radius:20px;
 }
 .glass-bar{
-  background:rgba(255,255,255,0.80);
+  background:rgba(12,15,26,0.75);
   backdrop-filter:blur(24px) saturate(200%);
   -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border-bottom:1px solid rgba(255,255,255,0.06);
 }
 .glass-sidebar{
-  background:rgba(255,255,255,0.65);
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  border-right:0.5px solid rgba(0,0,0,0.04);
+  background:rgba(12,15,26,0.85);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-right:1px solid rgba(255,255,255,0.06);
 }
 .safe-bottom{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideLeft{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideRight{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}10%{opacity:1;transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-4px)}}
-.anim-fade{animation:fadeIn 0.25s ease-out}
-.anim-left{animation:slideLeft 0.2s ease-out}
-.anim-right{animation:slideRight 0.2s ease-out}
-.toast{animation:toast 1.8s ease-out forwards}
-@media(prefers-reduced-motion:reduce){.anim-fade,.anim-left,.anim-right,.toast{animation:none}}
+
+/* ═══ Animations ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,12px)}8%{opacity:1;transform:translate(-50%,0)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-6px)}}
+@keyframes pulse{0%,100%{opacity:0.6}50%{opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes checkDraw{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+@keyframes popIn{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(99,102,241,0.15)}50%{box-shadow:0 0 40px rgba(99,102,241,0.3)}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes staggerIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes splashFade{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes splashScale{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1);opacity:1}100%{transform:scale(1.05);opacity:1}}
+
+.anim-fade{animation:fadeUp 0.35s cubic-bezier(0.22,1,0.36,1)}
+.anim-left{animation:slideLeft 0.25s cubic-bezier(0.22,1,0.36,1)}
+.anim-right{animation:slideRight 0.25s cubic-bezier(0.22,1,0.36,1)}
+.toast{animation:toast 2s ease-out forwards}
+.anim-pop{animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1)}
+.anim-glow{animation:glow 2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.anim-fade,.anim-left,.anim-right,.toast,.anim-pop,.anim-glow{animation:none}}
 ::-webkit-scrollbar{width:0}
-textarea:focus{border-color:rgba(99,102,241,0.3)!important;box-shadow:0 0 0 3px rgba(99,102,241,0.08)!important}
-button:active{transform:scale(0.97)}
+textarea:focus{border-color:rgba(129,140,248,0.4)!important;box-shadow:0 0 0 3px rgba(129,140,248,0.12),0 0 20px rgba(129,140,248,0.08)!important}
+button{transition:all 0.15s cubic-bezier(0.22,1,0.36,1)}
+button:active{transform:scale(0.96)}
 </style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
 <div id="root"></div>
+
+<!-- ═══ Animated background ═══ -->
+<script>
+(function(){
+  var c=document.getElementById("bg-canvas"),ctx=c.getContext("2d");
+  var orbs=[],W,H;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize(); window.addEventListener("resize",resize);
+  var colors=["rgba(99,102,241,0.25)","rgba(168,85,247,0.2)","rgba(59,130,246,0.18)","rgba(236,72,153,0.12)","rgba(16,185,129,0.15)"];
+  for(var i=0;i<5;i++){
+    orbs.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*200+150,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,c:colors[i]});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle="#0c0f1a";ctx.fillRect(0,0,W,H);
+    orbs.forEach(function(o){
+      o.x+=o.vx;o.y+=o.vy;
+      if(o.x<-o.r)o.x=W+o.r;if(o.x>W+o.r)o.x=-o.r;
+      if(o.y<-o.r)o.y=H+o.r;if(o.y>H+o.r)o.y=-o.r;
+      var g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      g.addColorStop(0,o.c);g.addColorStop(1,"transparent");
+      ctx.fillStyle=g;ctx.fillRect(o.x-o.r,o.y-o.r,o.r*2,o.r*2);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
 <script type="text/babel">
 const {useState,useRef,useEffect,useCallback,useMemo} = React;
 
@@ -92,9 +143,9 @@ const questions = [
 ];
 
 const SC = {
-  "影片 A：開場影片（約 2 分鐘）":{badge:"A",accent:"#D97706",light:"#FEF3C7",dark:"#92400E",progress:"#F59E0B",promptBg:"rgba(254,243,199,0.45)",promptBorder:"rgba(217,119,6,0.18)",confirmBg:"rgba(254,243,199,0.35)",confirmBorder:"rgba(217,119,6,0.30)"},
-  "影片 B：1999 整合介紹":{badge:"B",accent:"#059669",light:"#D1FAE5",dark:"#065F46",progress:"#10B981",promptBg:"rgba(209,250,229,0.45)",promptBorder:"rgba(5,150,105,0.18)",confirmBg:"rgba(209,250,229,0.35)",confirmBorder:"rgba(5,150,105,0.30)"},
-  "整體 & 補充":{badge:"+",accent:"#7C3AED",light:"#EDE9FE",dark:"#5B21B6",progress:"#A855F7",promptBg:"rgba(237,233,254,0.45)",promptBorder:"rgba(124,58,237,0.18)",confirmBg:"rgba(237,233,254,0.35)",confirmBorder:"rgba(124,58,237,0.30)"},
+  "影片 A：開場影片（約 2 分鐘）":{badge:"A",accent:"#F59E0B",light:"rgba(245,158,11,0.15)",dark:"#FCD34D",progress:"#F59E0B",promptBg:"rgba(245,158,11,0.08)",promptBorder:"rgba(245,158,11,0.2)",confirmBg:"rgba(245,158,11,0.06)",confirmBorder:"rgba(245,158,11,0.2)",glow:"rgba(245,158,11,0.15)"},
+  "影片 B：1999 整合介紹":{badge:"B",accent:"#10B981",light:"rgba(16,185,129,0.15)",dark:"#6EE7B7",progress:"#10B981",promptBg:"rgba(16,185,129,0.08)",promptBorder:"rgba(16,185,129,0.2)",confirmBg:"rgba(16,185,129,0.06)",confirmBorder:"rgba(16,185,129,0.2)",glow:"rgba(16,185,129,0.15)"},
+  "整體 & 補充":{badge:"+",accent:"#A855F7",light:"rgba(168,85,247,0.15)",dark:"#C4B5FD",progress:"#A855F7",promptBg:"rgba(168,85,247,0.08)",promptBorder:"rgba(168,85,247,0.2)",confirmBg:"rgba(168,85,247,0.06)",confirmBorder:"rgba(168,85,247,0.2)",glow:"rgba(168,85,247,0.15)"},
 };
 
 const sections = ["影片 A：開場影片（約 2 分鐘）","影片 B：1999 整合介紹","整體 & 補充"];
@@ -104,18 +155,18 @@ const sectionData = sections.map(sec => {
   return { sec, qs, startIdx, sc: SC[sec] };
 });
 
-/* ═══ Shared Styles ═══ */
+/* ═══ Styles (dark theme) ═══ */
 const S = {
-  badge:(sc)=>({display:"inline-flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:8,background:sc.light,color:sc.dark,fontSize:13,fontWeight:700}),
-  pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(59,130,246,0.08)",color:"#2563EB",fontSize:11,fontWeight:600},
-  btnPrimary:{padding:"13px 28px",background:"#0F172A",color:"#fff",borderRadius:12,fontSize:15,fontWeight:600,border:"none",cursor:"pointer",transition:"all 0.15s"},
-  btnSecondary:{padding:"13px 28px",background:"rgba(255,255,255,0.55)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"0.5px solid rgba(0,0,0,0.06)",color:"#475569",borderRadius:12,fontSize:14,fontWeight:500,cursor:"pointer",transition:"all 0.15s"},
-  btnText:{padding:"10px 14px",background:"none",border:"none",color:"#64748B",fontSize:14,fontWeight:500,cursor:"pointer"},
-  textarea:{width:"100%",background:"rgba(255,255,255,0.85)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:12,padding:16,fontSize:16,color:"#1E293B",border:"0.5px solid rgba(0,0,0,0.06)",outline:"none",resize:"none",overflow:"hidden",lineHeight:1.7,fontFamily:"inherit",transition:"border-color 0.2s, box-shadow 0.2s"},
+  badge:(sc)=>({display:"inline-flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:8,background:sc.light,color:sc.dark||sc.accent,fontSize:13,fontWeight:700}),
+  pillBadge:{display:"inline-flex",alignItems:"center",padding:"3px 10px",borderRadius:999,background:"rgba(129,140,248,0.12)",color:"#818CF8",fontSize:11,fontWeight:600},
+  btnPrimary:{padding:"14px 28px",background:"linear-gradient(135deg,#6366F1,#8B5CF6)",color:"#fff",borderRadius:14,fontSize:15,fontWeight:600,border:"none",cursor:"pointer",boxShadow:"0 4px 20px rgba(99,102,241,0.3)"},
+  btnSecondary:{padding:"14px 28px",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(255,255,255,0.7)",borderRadius:14,fontSize:14,fontWeight:500,cursor:"pointer"},
+  btnText:{padding:"10px 14px",background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:14,fontWeight:500,cursor:"pointer"},
+  textarea:{width:"100%",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:14,padding:16,fontSize:16,color:"rgba(255,255,255,0.9)",border:"1px solid rgba(255,255,255,0.08)",outline:"none",resize:"none",overflow:"hidden",lineHeight:1.7,fontFamily:"inherit"},
 };
 
 /* ═══ SVG Icons ═══ */
-const VideoIcon = () => (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l5-3v10l-5-3"/></svg>);
+const VideoIcon = () => (<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l5-3v10l-5-3"/></svg>);
 const ChevronLeft = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>);
 const ChevronRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>);
 const CheckIcon = ({size=18,color="currentColor"}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>);
@@ -125,11 +176,35 @@ const CloseIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="n
 const TrashIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>);
 const ListIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>);
 
-/* ═══ Toast Component ═══ */
+/* ═══ Animated Check ═══ */
+const AnimCheck = ({color="#fff",size=12}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 13l4 4L19 7" strokeDasharray="24" style={{animation:"checkDraw 0.3s ease-out forwards"}}/>
+  </svg>
+);
+
+/* ═══ Confetti ═══ */
+function Confetti({active}) {
+  if (!active) return null;
+  const pieces = useMemo(() => Array.from({length:50},(_,i) => ({
+    id:i,left:Math.random()*100,delay:Math.random()*2,dur:2+Math.random()*2,
+    color:["#F59E0B","#10B981","#A855F7","#6366F1","#EC4899","#3B82F6"][i%6],
+    size:4+Math.random()*6,
+  })),[]);
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",overflow:"hidden"}}>
+      {pieces.map(p => (
+        <div key={p.id} style={{position:"absolute",left:p.left+"%",top:-10,width:p.size,height:p.size*1.4,background:p.color,borderRadius:2,animation:`confettiFall ${p.dur}s ${p.delay}s ease-in forwards`,opacity:0}}/>
+      ))}
+    </div>
+  );
+}
+
+/* ═══ Toast ═══ */
 function Toast({message, visible}) {
   if (!visible) return null;
   return (
-    <div className="toast" style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"rgba(15,23,42,0.88)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:"#fff",fontSize:12,fontWeight:500,padding:"6px 16px",borderRadius:999,zIndex:200,pointerEvents:"none",whiteSpace:"nowrap"}}>
+    <div className="toast" style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"rgba(255,255,255,0.1)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(255,255,255,0.8)",fontSize:12,fontWeight:500,padding:"6px 16px",borderRadius:999,zIndex:200,pointerEvents:"none",whiteSpace:"nowrap"}}>
       {message}
     </div>
   );
@@ -146,10 +221,10 @@ function Timeline({currentIndex, answers, isWide}) {
         <span style={{fontSize:11,fontWeight:600,color:cur.sc.dark,background:cur.sc.light,padding:"2px 8px",borderRadius:6,flexShrink:0}}>{cur.sc.badge}</span>
         <div style={{flex:1,display:"flex",gap:2}}>
           {cur.qs.map((q, qi) => (
-            <div key={qi} style={{flex:1,height:qi===localIdx?5:3,borderRadius:3,background:qi===localIdx?cur.sc.accent:(answers[cur.startIdx+qi]&&answers[cur.startIdx+qi].trim())?cur.sc.progress:"rgba(0,0,0,0.08)",transition:"all 0.3s"}}/>
+            <div key={qi} style={{flex:1,height:qi===localIdx?5:3,borderRadius:3,background:qi===localIdx?cur.sc.accent:(answers[cur.startIdx+qi]&&answers[cur.startIdx+qi].trim())?cur.sc.progress:"rgba(255,255,255,0.08)",transition:"all 0.3s",boxShadow:qi===localIdx?`0 0 8px ${cur.sc.glow}`:""}}/>
           ))}
         </div>
-        <span style={{fontSize:11,color:"#94A3B8",flexShrink:0,fontVariantNumeric:"tabular-nums"}}>{localIdx+1}/{cur.qs.length}</span>
+        <span style={{fontSize:11,color:"rgba(255,255,255,0.35)",flexShrink:0,fontVariantNumeric:"tabular-nums"}}>{localIdx+1}/{cur.qs.length}</span>
       </div>
     );
   }
@@ -157,13 +232,13 @@ function Timeline({currentIndex, answers, isWide}) {
     <div style={{display:"flex",gap:2,padding:"4px 8px",alignItems:"center"}}>
       {sectionData.map((sd, si) => (
         <React.Fragment key={si}>
-          {si > 0 && <div style={{width:1,height:10,background:"rgba(0,0,0,0.08)",flexShrink:0}}/>}
+          {si > 0 && <div style={{width:1,height:10,background:"rgba(255,255,255,0.06)",flexShrink:0}}/>}
           <div style={{display:"flex",gap:1,flex:sd.qs.length}}>
             {sd.qs.map((q, qi) => {
               const idx = sd.startIdx + qi;
               const answered = answers[idx] && answers[idx].trim();
               const current = idx === currentIndex;
-              return <div key={idx} style={{flex:1,height:current?6:4,borderRadius:3,background:current?sd.sc.accent:answered?sd.sc.progress:"rgba(0,0,0,0.06)",transition:"all 0.3s",opacity:answered&&!current?0.6:1}}/>;
+              return <div key={idx} style={{flex:1,height:current?6:4,borderRadius:3,background:current?sd.sc.accent:answered?sd.sc.progress:"rgba(255,255,255,0.06)",transition:"all 0.3s",opacity:answered&&!current?0.5:1,boxShadow:current?`0 0 8px ${sd.sc.glow}`:""}}/>;
             })}
           </div>
         </React.Fragment>
@@ -177,29 +252,28 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, 
   if (!isWide && !showMobile) return null;
   const style = isWide
     ? {width:260,flexShrink:0,overflowY:"auto",padding:"16px 12px"}
-    : {position:"fixed",top:0,left:0,bottom:0,width:280,zIndex:100,padding:"16px 12px",overflowY:"auto",boxShadow:"4px 0 30px rgba(0,0,0,0.1)"};
+    : {position:"fixed",top:0,left:0,bottom:0,width:280,zIndex:100,padding:"16px 12px",overflowY:"auto",boxShadow:"4px 0 40px rgba(0,0,0,0.3)"};
 
   return (
     <>
-      {!isWide && <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.25)",backdropFilter:"blur(2px)",WebkitBackdropFilter:"blur(2px)",zIndex:99,transition:"opacity 0.2s"}}/>}
+      {!isWide && <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)",WebkitBackdropFilter:"blur(4px)",zIndex:99}}/>}
       <div className="glass-sidebar" style={style}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,padding:"0 4px"}}>
-          <span style={{fontSize:13,fontWeight:700,color:"#0F172A"}}>題目列表</span>
-          {!isWide && <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:"#94A3B8",padding:4}}><CloseIcon/></button>}
+          <span style={{fontSize:13,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>題目列表</span>
+          {!isWide && <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.3)",padding:4}}><CloseIcon/></button>}
         </div>
 
-        {/* Overview button */}
-        <button onClick={() => { onOverview(); if(!isWide) onClose(); }} style={{width:"100%",padding:"10px 12px",marginBottom:12,borderRadius:10,border:"0.5px solid rgba(0,0,0,0.06)",background:"rgba(255,255,255,0.5)",fontSize:12,fontWeight:500,color:"#475569",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:8,transition:"all 0.15s"}}>
+        <button onClick={() => { onOverview(); if(!isWide) onClose(); }} style={{width:"100%",padding:"10px 12px",marginBottom:12,borderRadius:10,border:"1px solid rgba(255,255,255,0.06)",background:"rgba(255,255,255,0.04)",fontSize:12,fontWeight:500,color:"rgba(255,255,255,0.6)",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:8}}>
           <ListIcon/>
           <span style={{flex:1}}>查看總覽</span>
-          <span style={{fontSize:11,color:"#94A3B8",fontVariantNumeric:"tabular-nums"}}>{answeredCount}/{total}</span>
+          <span style={{fontSize:11,color:"rgba(255,255,255,0.3)",fontVariantNumeric:"tabular-nums"}}>{answeredCount}/{total}</span>
         </button>
 
         {sectionData.map(sd => (
           <div key={sd.sec} style={{marginBottom:14}}>
             <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 4px"}}>
               <span style={{...S.badge(sd.sc),width:20,height:20,fontSize:9,borderRadius:5}}>{sd.sc.badge}</span>
-              <span style={{fontSize:11,fontWeight:600,color:"#64748B"}}>{sd.sec.split("：")[0]}</span>
+              <span style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.35)"}}>{sd.sec.split("：")[0]}</span>
             </div>
             {sd.qs.map((q, qi) => {
               const idx = sd.startIdx + qi;
@@ -209,17 +283,16 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, 
                 <button key={idx} onClick={() => { onJumpTo(idx); if(!isWide) onClose(); }} style={{
                   display:"flex",alignItems:"center",gap:8,width:"100%",textAlign:"left",
                   padding:"7px 8px",borderRadius:8,marginBottom:2,border:"none",cursor:"pointer",
-                  background:current?"rgba(15,23,42,0.06)":"transparent",
-                  transition:"all 0.15s",
-                  borderLeft:current?"3px solid "+sd.sc.accent:"3px solid transparent",
+                  background:current?"rgba(255,255,255,0.06)":"transparent",
+                  borderLeft:current?`3px solid ${sd.sc.accent}`:"3px solid transparent",
                 }}>
                   <span style={{
                     flexShrink:0,width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
                     fontSize:10,fontWeight:700,
-                    background:answered?sd.sc.light:current?"rgba(0,0,0,0.04)":"transparent",
-                    color:answered?sd.sc.dark:"#94A3B8",
+                    background:answered?sd.sc.light:current?"rgba(255,255,255,0.06)":"transparent",
+                    color:answered?sd.sc.dark:"rgba(255,255,255,0.25)",
                   }}>{answered ? <CheckIcon size={12} color={sd.sc.accent}/> : q.id}</span>
-                  <span style={{fontSize:12,color:current?"#0F172A":"#64748B",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
+                  <span style={{fontSize:12,color:current?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.4)",fontWeight:current?600:400,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}}>
                     {q.title.slice(0,18)}{q.title.length>18?"⋯":""}
                   </span>
                 </button>
@@ -232,50 +305,21 @@ function Sidebar({currentIndex, answers, onJumpTo, isWide, showMobile, onClose, 
   );
 }
 
-/* ═══ Section Transition ═══ */
-function SectionBanner({section}) {
-  const sc = SC[section];
-  return (
-    <div className="anim-fade" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",marginBottom:8,borderRadius:12,background:sc.confirmBg,border:"1px solid "+sc.confirmBorder}}>
-      <span style={S.badge(sc)}>{sc.badge}</span>
-      <div>
-        <p style={{fontSize:14,fontWeight:600,color:sc.dark,margin:0}}>{section}</p>
-        <p style={{fontSize:11,color:"#94A3B8",margin:0}}>
-          {section.includes("A")?"共 8 題":section.includes("B")?"共 9 題":"共 7 題"}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ═══ Auto-resize textarea hook ═══ */
+/* ═══ Hooks ═══ */
 function useAutoResize(ref, value) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = Math.max(100, el.scrollHeight) + "px";
-  }, [value]);
+  useEffect(() => { const el = ref.current; if (!el) return; el.style.height = "auto"; el.style.height = Math.max(100, el.scrollHeight) + "px"; }, [value]);
 }
-
-/* ═══ Swipe hook ═══ */
 function useSwipe(onLeft, onRight) {
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const handlers = useMemo(() => ({
+  const startX = useRef(0), startY = useRef(0);
+  return useMemo(() => ({
     onTouchStart: (e) => { startX.current = e.touches[0].clientX; startY.current = e.touches[0].clientY; },
-    onTouchEnd: (e) => {
-      const dx = e.changedTouches[0].clientX - startX.current;
-      const dy = e.changedTouches[0].clientY - startY.current;
-      if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
-      if (dx < 0) onLeft(); else onRight();
-    },
+    onTouchEnd: (e) => { const dx = e.changedTouches[0].clientX - startX.current; const dy = e.changedTouches[0].clientY - startY.current; if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return; if (dx < 0) onLeft(); else onRight(); },
   }), [onLeft, onRight]);
-  return handlers;
 }
 
 /* ═══ App ═══ */
 function App() {
+  const [splash, setSplash] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [answers, setAnswers] = useState({});
   const [isComplete, setIsComplete] = useState(false);
@@ -287,22 +331,19 @@ function App() {
   const [slideDir, setSlideDir] = useState("left");
   const [toastMsg, setToastMsg] = useState("");
   const [toastKey, setToastKey] = useState(0);
-  const [showSectionBanner, setShowSectionBanner] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [overviewFilter, setOverviewFilter] = useState("all");
   const submittingRef = useRef(false);
   const textareaRef = useRef(null);
   const contentRef = useRef(null);
-  const prevSection = useRef("");
 
   useAutoResize(textareaRef, answers[currentIndex]);
 
-  useEffect(() => {
-    const h = () => setIsWide(window.innerWidth >= 768);
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []);
+  /* Splash screen */
+  useEffect(() => { setTimeout(() => setSplash(false), 1800); }, []);
 
-  /* Focus textarea + scroll to top on question change */
+  useEffect(() => { const h = () => setIsWide(window.innerWidth >= 768); window.addEventListener("resize", h); return () => window.removeEventListener("resize", h); }, []);
+
   useEffect(() => {
     if (currentIndex >= 0) {
       setTimeout(() => { if(textareaRef.current) textareaRef.current.focus(); }, 150);
@@ -310,33 +351,13 @@ function App() {
     }
   }, [currentIndex]);
 
-  /* Section transition detection */
-  useEffect(() => {
-    if (currentIndex < 0) return;
-    const curSec = questions[currentIndex].section;
-    if (curSec !== prevSection.current && prevSection.current !== "") {
-      setShowSectionBanner(true);
-      setTimeout(() => setShowSectionBanner(false), 2000);
-    }
-    prevSection.current = curSec;
-  }, [currentIndex]);
-
-  /* Load from localStorage */
-  useEffect(() => {
-    try { const s = localStorage.getItem("env_video_answers"); if (s) setAnswers(JSON.parse(s)); } catch(e) {}
-  }, []);
-
-  /* Debounced save to localStorage with toast */
+  useEffect(() => { try { const s = localStorage.getItem("env_video_answers"); if (s) setAnswers(JSON.parse(s)); } catch(e) {} }, []);
   const saveTimerRef = useRef(null);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      try {
-        localStorage.setItem("env_video_answers", JSON.stringify(answers));
-        if (currentIndex >= 0 && Object.keys(answers).length > 0) {
-          setToastMsg("已自動保存");
-          setToastKey(k => k + 1);
-        }
+      try { localStorage.setItem("env_video_answers", JSON.stringify(answers));
+        if (currentIndex >= 0 && Object.keys(answers).length > 0) { setToastMsg("已自動保存"); setToastKey(k => k + 1); }
       } catch(e) {}
     }, 800);
   }, [answers]);
@@ -346,58 +367,26 @@ function App() {
   const currentQuestion = currentIndex >= 0 ? questions[currentIndex] : null;
   const sc = currentQuestion ? SC[currentQuestion.section] : null;
   const hasResume = useMemo(() => Object.keys(answers).length > 0, [answers]);
-  const lastAnswered = useMemo(() => {
-    for (let i = questions.length - 1; i >= 0; i--) { if (answers[i] && answers[i].trim()) return i; }
-    return -1;
-  }, [answers]);
+  const lastAnswered = useMemo(() => { for (let i = questions.length - 1; i >= 0; i--) { if (answers[i] && answers[i].trim()) return i; } return -1; }, [answers]);
 
-  const goNext = useCallback(() => {
-    setSlideDir("left");
-    if (currentIndex < total - 1) { setCurrentIndex(currentIndex + 1); setExpandedPrompts(true); }
-    else { setIsComplete(true); }
-  }, [currentIndex, total]);
+  const goNext = useCallback(() => { setSlideDir("left"); if (currentIndex < total - 1) { setCurrentIndex(currentIndex + 1); setExpandedPrompts(true); } else { setIsComplete(true); } }, [currentIndex, total]);
+  const goPrev = useCallback(() => { setSlideDir("right"); if (currentIndex > 0) { setCurrentIndex(currentIndex - 1); setExpandedPrompts(true); } else if (currentIndex === 0) { setCurrentIndex(-1); } }, [currentIndex]);
+  const jumpTo = useCallback((i) => { setSlideDir(i > currentIndex ? "left" : "right"); setCurrentIndex(i); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true); }, [currentIndex]);
 
-  const goPrev = useCallback(() => {
-    setSlideDir("right");
-    if (currentIndex > 0) { setCurrentIndex(currentIndex - 1); setExpandedPrompts(true); }
-    else if (currentIndex === 0) { setCurrentIndex(-1); }
-  }, [currentIndex]);
-
-  const jumpTo = useCallback((i) => {
-    setSlideDir(i > currentIndex ? "left" : "right");
-    setCurrentIndex(i); setShowOverview(false); setIsComplete(false); setExpandedPrompts(true);
-  }, [currentIndex]);
-
-  /* Prompt toggle logic */
   const cleanPrompt = (p) => p.replace(/[？？]$/, "");
-  const isPromptSelected = (p) => {
-    const cur = answers[currentIndex] || "";
-    return cur.split("\n").some(l => l.trim() === cleanPrompt(p));
-  };
+  const isPromptSelected = (p) => { const cur = answers[currentIndex] || ""; return cur.split("\n").some(l => l.trim() === cleanPrompt(p)); };
   const handlePromptClick = (p) => {
-    const clean = cleanPrompt(p);
-    const cur = answers[currentIndex] || "";
-    const lines = cur.split("\n").filter(l => l.trim());
-    const idx = lines.findIndex(l => l.trim() === clean);
-    if (idx >= 0) {
-      lines.splice(idx, 1);
-      setAnswers(prev => ({...prev, [currentIndex]: lines.join("\n")}));
-    } else {
-      setAnswers(prev => ({...prev, [currentIndex]: lines.length ? lines.join("\n") + "\n" + clean : clean}));
-    }
+    const clean = cleanPrompt(p); const cur = answers[currentIndex] || "";
+    const lines = cur.split("\n").filter(l => l.trim()); const idx = lines.findIndex(l => l.trim() === clean);
+    if (idx >= 0) { lines.splice(idx, 1); setAnswers(prev => ({...prev, [currentIndex]: lines.join("\n")})); }
+    else { setAnswers(prev => ({...prev, [currentIndex]: lines.length ? lines.join("\n") + "\n" + clean : clean})); }
     if (textareaRef.current) textareaRef.current.focus();
   };
+  const clearAnswer = () => { setAnswers(prev => { const next = {...prev}; delete next[currentIndex]; return next; }); };
 
-  /* Clear answer for current question */
-  const clearAnswer = () => {
-    setAnswers(prev => { const next = {...prev}; delete next[currentIndex]; return next; });
-  };
-
-  /* Submit to Google Sheets */
   const doSubmit = () => {
     if (!SHEET_SCRIPT_URL || submittingRef.current) return;
-    submittingRef.current = true;
-    setSubmitStatus("submitting");
+    submittingRef.current = true; setSubmitStatus("submitting");
     try {
       const payload = JSON.stringify({timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>answers[i]||"（未填寫）")});
       let iframe = document.getElementById("sheet-submit-frame");
@@ -405,38 +394,51 @@ function App() {
       const form = document.createElement("form"); form.method="POST"; form.action=SHEET_SCRIPT_URL; form.target="sheet-submit";
       const input = document.createElement("input"); input.type="hidden"; input.name="data"; input.value=payload;
       form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
-      setTimeout(() => { setSubmitStatus("success"); submittingRef.current = false; }, 2500);
-    } catch(err) {
-      setSubmitStatus("error");
-      submittingRef.current = false;
-    }
+      setTimeout(() => { setSubmitStatus("success"); submittingRef.current = false; setShowConfetti(true); setTimeout(() => setShowConfetti(false), 4000); }, 2500);
+    } catch(err) { setSubmitStatus("error"); submittingRef.current = false; }
   };
 
-  /* Swipe navigation */
   const swipeHandlers = useSwipe(goNext, goPrev);
+
+  /* ═══ Splash ═══ */
+  if (splash) {
+    return (
+      <div style={{minHeight:"100vh",minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}}>
+        <div style={{animation:"splashScale 1.5s cubic-bezier(0.22,1,0.36,1) forwards"}}>
+          <div style={{width:72,height:72,borderRadius:20,background:"linear-gradient(135deg,#6366F1,#A855F7)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 60px rgba(99,102,241,0.4)"}}><VideoIcon/></div>
+        </div>
+        <p style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginTop:20,fontWeight:500,animation:"fadeUp 0.8s 0.5s ease-out both"}}>環境部影片需求確認</p>
+      </div>
+    );
+  }
 
   /* ═══ Welcome ═══ */
   if (currentIndex === -1 && !isComplete && !showOverview) {
     return (
       <div style={{minHeight:"100vh",minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-        <div className="glass anim-fade" style={{maxWidth:460,width:"100%",padding:28,textAlign:"center"}}>
-          <div style={{width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#0F172A,#334155)",display:"inline-flex",alignItems:"center",justifyContent:"center",marginBottom:20}}><VideoIcon/></div>
-          <h1 style={{fontSize:21,fontWeight:700,color:"#0F172A",marginBottom:6}}>環境部影片需求確認</h1>
-          <p style={{color:"#94A3B8",fontSize:14,marginBottom:4}}>兩支影片 · 共 {total} 題</p>
-          <p style={{color:"#CBD5E1",fontSize:12,marginBottom:24}}>我已整理目前掌握的資訊，請副總確認與補充</p>
+        <div className="glass anim-fade" style={{maxWidth:460,width:"100%",padding:32,textAlign:"center"}}>
+          <div className="anim-glow" style={{width:56,height:56,borderRadius:16,background:"linear-gradient(135deg,#6366F1,#8B5CF6)",display:"inline-flex",alignItems:"center",justifyContent:"center",marginBottom:24,boxShadow:"0 0 40px rgba(99,102,241,0.3)"}}><VideoIcon/></div>
+          <h1 style={{fontSize:22,fontWeight:700,color:"#fff",marginBottom:6}}>環境部影片需求確認</h1>
+          <p style={{color:"rgba(255,255,255,0.4)",fontSize:14,marginBottom:4}}>兩支影片 · 共 {total} 題</p>
+          <p style={{color:"rgba(255,255,255,0.25)",fontSize:12,marginBottom:28}}>我已整理目前掌握的資訊，請副總確認與補充</p>
 
-          <div style={{background:"rgba(255,255,255,0.5)",borderRadius:12,padding:18,marginBottom:14,textAlign:"left",border:"0.5px solid rgba(0,0,0,0.04)"}}>
-            <p style={{fontSize:13,fontWeight:600,color:"#334155",marginBottom:10}}>已掌握的資訊</p>
-            <div style={{fontSize:13,color:"#475569",lineHeight:2.0}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[0]]),width:20,height:20,fontSize:10,borderRadius:6}}>A</span> 開場約 2 分鐘，歡樂氛圍，部長入鏡</div>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[1]]),width:20,height:20,fontSize:10,borderRadius:6}}>B</span> 1999 服務整合介紹，一鏡到底風格</div>
-              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{...S.badge(SC[sections[2]]),width:20,height:20,fontSize:10,borderRadius:6}}>+</span> 不只 1999，也要帶到 LINE 及其他管道</div>
+          <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:18,marginBottom:14,textAlign:"left",border:"1px solid rgba(255,255,255,0.06)"}}>
+            <p style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.7)",marginBottom:10}}>已掌握的資訊</p>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",lineHeight:2.0}}>
+              {sectionData.map(sd => (
+                <div key={sd.sec} style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{...S.badge(sd.sc),width:20,height:20,fontSize:10,borderRadius:6}}>{sd.sc.badge}</span>
+                  {sd.sec.includes("A")&&"開場約 2 分鐘，歡樂氛圍，部長入鏡"}
+                  {sd.sec.includes("B")&&"1999 服務整合介紹，一鏡到底風格"}
+                  {sd.sec.includes("補充")&&"不只 1999，也要帶到 LINE 及其他管道"}
+                </div>
+              ))}
             </div>
           </div>
 
-          <div style={{background:"rgba(59,130,246,0.04)",borderRadius:12,padding:16,marginBottom:24,textAlign:"left",border:"0.5px solid rgba(59,130,246,0.08)"}}>
-            <p style={{fontSize:13,fontWeight:600,color:"#1D4ED8",marginBottom:8}}>填寫方式</p>
-            <div style={{fontSize:12,color:"#3B82F6",lineHeight:2.1}}>
+          <div style={{background:"rgba(129,140,248,0.06)",borderRadius:14,padding:16,marginBottom:28,textAlign:"left",border:"1px solid rgba(129,140,248,0.1)"}}>
+            <p style={{fontSize:13,fontWeight:600,color:"#818CF8",marginBottom:8}}>填寫方式</p>
+            <div style={{fontSize:12,color:"rgba(129,140,248,0.7)",lineHeight:2.1}}>
               <div>· 支援語音輸入，直接對手機說就好</div>
               <div>· 每題有快速選項，可多選、再點取消</div>
               <div>· 標「已知」的題目只需確認是否正確</div>
@@ -451,16 +453,15 @@ function App() {
               <button onClick={() => setCurrentIndex(Math.min(lastAnswered + 1, total - 1))} style={{...S.btnPrimary,flex:1,fontSize:15}}>繼續填寫</button>
             </div>
           ) : (
-            <button onClick={() => setCurrentIndex(0)} style={{...S.btnPrimary,width:"100%",padding:"15px 28px",fontSize:16}}>開始填寫</button>
+            <button onClick={() => setCurrentIndex(0)} style={{...S.btnPrimary,width:"100%",padding:"16px 28px",fontSize:16}}>開始填寫</button>
           )}
-
-          {hasResume && <p style={{color:"#94A3B8",fontSize:11,marginTop:10}}>上次填了 {answeredCount} 題，進度已保存</p>}
+          {hasResume && <p style={{color:"rgba(255,255,255,0.25)",fontSize:11,marginTop:10}}>上次填了 {answeredCount} 題，進度已保存</p>}
         </div>
       </div>
     );
   }
 
-  /* ═══ Overview / Complete ═══ */
+  /* ═══ Overview ═══ */
   if (showOverview || isComplete) {
     let sec = "";
     const filteredQs = questions.filter((q, i) => {
@@ -470,29 +471,27 @@ function App() {
     });
     return (
       <div style={{minHeight:"100vh",minHeight:"100dvh",padding:16}}>
+        <Confetti active={showConfetti}/>
         <div style={{maxWidth:600,margin:"0 auto"}}>
           <div className="glass anim-fade" style={{padding:24,marginBottom:16}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-              <h2 style={{fontSize:19,fontWeight:700,color:"#0F172A"}}>{isComplete ? "確認完成！" : "問卷總覽"}</h2>
+              <h2 style={{fontSize:19,fontWeight:700,color:"#fff"}}>{isComplete ? "確認完成！" : "問卷總覽"}</h2>
               {!isComplete && <button onClick={() => {setShowOverview(false);setIsComplete(false);}} style={{...S.btnText,fontSize:13,padding:"4px 8px",display:"flex",alignItems:"center",gap:2}}><CloseIcon/></button>}
             </div>
-            <p style={{color:"#94A3B8",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題 {answeredCount === total && " — 全部完成！"}</p>
-            <div style={{width:"100%",background:"rgba(0,0,0,0.04)",borderRadius:999,height:6,marginBottom:16}}>
-              <div style={{background:answeredCount===total?"#059669":"#0F172A",height:6,borderRadius:999,transition:"width 0.5s",width:(answeredCount/total*100)+"%"}}/>
+            <p style={{color:"rgba(255,255,255,0.35)",fontSize:13,marginBottom:14}}>已填 {answeredCount} / {total} 題 {answeredCount === total && " — 全部完成！"}</p>
+            <div style={{width:"100%",background:"rgba(255,255,255,0.06)",borderRadius:999,height:6,marginBottom:16}}>
+              <div style={{background:answeredCount===total?"#10B981":"linear-gradient(90deg,#6366F1,#A855F7)",height:6,borderRadius:999,transition:"width 0.5s",width:(answeredCount/total*100)+"%",boxShadow:answeredCount===total?"0 0 12px rgba(16,185,129,0.4)":"0 0 12px rgba(99,102,241,0.3)"}}/>
             </div>
-
-            {/* Filter tabs */}
             <div style={{display:"flex",gap:6,marginBottom:16}}>
               {[["all","全部"],["unanswered","未填"],["answered","已填"]].map(([k,label]) => (
-                <button key={k} onClick={() => setOverviewFilter(k)} style={{padding:"5px 12px",borderRadius:8,fontSize:12,fontWeight:overviewFilter===k?600:400,border:"none",cursor:"pointer",background:overviewFilter===k?"#0F172A":"rgba(0,0,0,0.04)",color:overviewFilter===k?"#fff":"#64748B",transition:"all 0.15s"}}>{label}</button>
+                <button key={k} onClick={() => setOverviewFilter(k)} style={{padding:"5px 12px",borderRadius:8,fontSize:12,fontWeight:overviewFilter===k?600:400,border:"none",cursor:"pointer",background:overviewFilter===k?"rgba(255,255,255,0.12)":"rgba(255,255,255,0.04)",color:overviewFilter===k?"#fff":"rgba(255,255,255,0.35)"}}>{label}</button>
               ))}
             </div>
-
-            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:submitStatus==="submitting"?0.6:1,background:submitStatus==="success"?"#059669":submitStatus==="error"?"#DC2626":"#0F172A"}}>
+            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:submitStatus==="submitting"?0.6:1,background:submitStatus==="success"?"linear-gradient(135deg,#059669,#10B981)":submitStatus==="error"?"linear-gradient(135deg,#DC2626,#EF4444)":"linear-gradient(135deg,#6366F1,#8B5CF6)"}}>
               <SendIcon/>
               {submitStatus==="idle"&&"送出回覆"}{submitStatus==="submitting"&&"送出中⋯"}{submitStatus==="success"&&"已成功送出"}{submitStatus==="error"&&"送出失敗，點此重試"}
             </button>
-            {submitStatus==="success"&&<p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已成功送出！</p>}
+            {submitStatus==="success"&&<p style={{textAlign:"center",color:"#10B981",fontSize:12,marginTop:10,fontWeight:500}}>回覆已成功送出！</p>}
           </div>
 
           {filteredQs.map((q) => {
@@ -500,28 +499,25 @@ function App() {
             const isNew = q.section !== sec; if (isNew) sec = q.section;
             const c = SC[q.section]; const has = answers[i] && answers[i].trim();
             return (<div key={q.id}>
-              {isNew && <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}><span style={S.badge(c)}>{c.badge}</span><span style={{fontWeight:600,color:"#334155",fontSize:13}}>{q.section}</span></div>}
-              <button onClick={() => jumpTo(i)} style={{width:"100%",textAlign:"left",borderRadius:12,padding:14,marginBottom:6,border:has?"1.5px solid "+c.confirmBorder:"0.5px solid rgba(0,0,0,0.04)",cursor:"pointer",transition:"all 0.2s",background:has?"rgba(255,255,255,0.75)":"rgba(255,255,255,0.55)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
+              {isNew && <div style={{display:"flex",alignItems:"center",gap:8,marginTop:22,marginBottom:10,padding:"0 4px"}}><span style={S.badge(c)}>{c.badge}</span><span style={{fontWeight:600,color:"rgba(255,255,255,0.6)",fontSize:13}}>{q.section}</span></div>}
+              <button onClick={() => jumpTo(i)} style={{width:"100%",textAlign:"left",borderRadius:14,padding:14,marginBottom:6,border:has?`1px solid ${c.confirmBorder}`:"1px solid rgba(255,255,255,0.04)",cursor:"pointer",background:has?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.02)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
                 <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
-                  <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(0,0,0,0.03)",color:has?c.dark:"#94A3B8"}}>{has?<CheckIcon size={14} color={c.accent}/>:q.id}</span>
+                  <span style={{flexShrink:0,width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:has?c.light:"rgba(255,255,255,0.04)",color:has?c.dark:"rgba(255,255,255,0.25)"}}>{has?<CheckIcon size={14} color={c.accent}/>:q.id}</span>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
-                      <span style={{fontSize:13,fontWeight:500,color:"#334155"}}>{q.title}</span>
+                      <span style={{fontSize:13,fontWeight:500,color:"rgba(255,255,255,0.8)"}}>{q.title}</span>
                       {q.type==="confirm"&&<span style={S.pillBadge}>已知待確認</span>}
                     </div>
-                    {has
-                      ?<p style={{fontSize:12,color:"#64748B",margin:0,lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{answers[i]}</p>
-                      :<p style={{fontSize:12,color:"#CBD5E1",fontStyle:"italic",margin:0}}>尚未填寫</p>
-                    }
+                    {has?<p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:0,lineHeight:1.6,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{answers[i]}</p>:<p style={{fontSize:12,color:"rgba(255,255,255,0.15)",fontStyle:"italic",margin:0}}>尚未填寫</p>}
                   </div>
                 </div>
               </button>
             </div>);
           })}
-          {filteredQs.length === 0 && <p style={{textAlign:"center",color:"#94A3B8",fontSize:13,padding:40}}>{overviewFilter==="unanswered"?"全部都填完了！":"還沒有填寫任何題目"}</p>}
+          {filteredQs.length === 0 && <p style={{textAlign:"center",color:"rgba(255,255,255,0.25)",fontSize:13,padding:40}}>{overviewFilter==="unanswered"?"全部都填完了！":"還沒有填寫任何題目"}</p>}
           <div style={{display:"flex",gap:10,marginTop:22,marginBottom:32}}>
             <button onClick={() => {setShowOverview(false);setIsComplete(false);setCurrentIndex(0);}} style={{...S.btnSecondary,flex:1}}>回到第一題</button>
-            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:submitStatus==="success"?"#059669":"#0F172A"}}><SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}</button>
+            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}><SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}</button>
           </div>
         </div>
       </div>
@@ -532,65 +528,52 @@ function App() {
   const curAnswer = answers[currentIndex] || "";
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === total - 1;
-  const isNewSection = currentIndex === 0 || questions[currentIndex].section !== questions[currentIndex - 1]?.section;
 
   return (
     <div style={{minHeight:"100vh",minHeight:"100dvh",display:"flex",flexDirection:"column"}} {...swipeHandlers}>
-      {/* Top bar */}
-      <div className="glass-bar" style={{padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"0.5px solid rgba(0,0,0,0.04)",position:"sticky",top:0,zIndex:50}}>
+      <div className="glass-bar" style={{padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:50}}>
         {!isWide && <button onClick={() => setShowSidebar(true)} style={{...S.btnText,fontSize:13,padding:"6px 8px",display:"flex",alignItems:"center",gap:4}}><MenuIcon/></button>}
         {isWide && <button onClick={() => setShowOverview(true)} style={{...S.btnText,fontSize:13,padding:"6px 10px",display:"flex",alignItems:"center",gap:2}}><ChevronLeft/> 總覽</button>}
         <div style={{flex:1,margin:"0 8px"}}><Timeline currentIndex={currentIndex} answers={answers} isWide={isWide}/></div>
-        {isWide && <span style={{fontSize:12,color:"#94A3B8",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>}
+        {isWide && <span style={{fontSize:12,color:"rgba(255,255,255,0.3)",fontWeight:500,fontVariantNumeric:"tabular-nums",flexShrink:0}}>{currentIndex+1}/{total}</span>}
       </div>
 
-      {/* Main area */}
       <div style={{flex:1,display:"flex",overflow:"hidden"}}>
         {isWide && <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={true} showMobile={false} onClose={()=>{}} onOverview={()=>setShowOverview(true)} answeredCount={answeredCount} total={total}/>}
         <Sidebar currentIndex={currentIndex} answers={answers} onJumpTo={jumpTo} isWide={false} showMobile={showSidebar} onClose={() => setShowSidebar(false)} onOverview={()=>setShowOverview(true)} answeredCount={answeredCount} total={total}/>
 
-        {/* Question content */}
-        <div ref={contentRef} style={{flex:1,overflowY:"auto",padding:"20px 16px 100px"}} className={slideDir==="left"?"anim-left":"anim-right"} key={currentIndex}>
+        <div ref={contentRef} style={{flex:1,overflowY:"auto",padding:"24px 16px 120px"}} className={slideDir==="left"?"anim-left":"anim-right"} key={currentIndex}>
           <div style={{maxWidth:520,width:"100%",margin:"0 auto"}}>
-
-            {/* Section banner on section change */}
-            {isNewSection && showSectionBanner && <SectionBanner section={currentQuestion.section}/>}
-
-            {/* Question badge */}
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
               <span style={{display:"inline-flex",alignItems:"center",padding:"5px 14px",borderRadius:999,background:sc.light,color:sc.dark,fontSize:13,fontWeight:600}}>第 {currentQuestion.id} 題</span>
               {currentQuestion.type==="confirm"&&<span style={S.pillBadge}>已知待確認</span>}
             </div>
 
-            {/* Question title */}
-            <h2 style={{fontSize:18,fontWeight:700,color:"#0F172A",marginBottom:10,lineHeight:1.65}}>{currentQuestion.title}</h2>
+            <h2 style={{fontSize:18,fontWeight:700,color:"#fff",marginBottom:12,lineHeight:1.65}}>{currentQuestion.title}</h2>
 
-            {/* Prefilled info */}
             {currentQuestion.prefilled && (
-              <div className="glass" style={{padding:14,marginBottom:14,background:sc.confirmBg,border:"1px solid "+sc.confirmBorder,boxShadow:"none"}}>
-                <p style={{fontSize:11,color:"#94A3B8",marginBottom:3,fontWeight:500}}>目前掌握的資訊</p>
-                <p style={{fontSize:14,color:"#334155",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
+              <div style={{padding:16,marginBottom:14,borderRadius:14,background:sc.confirmBg,border:`1px solid ${sc.confirmBorder}`}}>
+                <p style={{fontSize:11,color:"rgba(255,255,255,0.35)",marginBottom:4,fontWeight:500}}>目前掌握的資訊</p>
+                <p style={{fontSize:14,color:"rgba(255,255,255,0.75)",lineHeight:1.7,margin:0}}>{currentQuestion.prefilled}</p>
               </div>
             )}
 
-            {/* Hint */}
-            <p style={{color:"#94A3B8",fontSize:13,marginBottom:14}}>{currentQuestion.hint}</p>
+            <p style={{color:"rgba(255,255,255,0.3)",fontSize:13,marginBottom:16}}>{currentQuestion.hint}</p>
 
-            {/* Prompts */}
             {currentQuestion.prompts && currentQuestion.prompts.length > 0 && (
-              <div style={{marginBottom:14}}>
-                <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#94A3B8",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
+              <div style={{marginBottom:16}}>
+                <button onClick={() => setExpandedPrompts(!expandedPrompts)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"rgba(255,255,255,0.3)",background:"none",border:"none",cursor:"pointer",marginBottom:8,padding:0,fontWeight:500}}>
                   <span>快速選擇（可多選）</span>
                   <span style={{fontSize:9,transition:"transform 0.2s",transform:expandedPrompts?"rotate(180deg)":"rotate(0)"}}>&#9650;</span>
                 </button>
                 {expandedPrompts && (
-                  <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <div style={{display:"flex",flexDirection:"column",gap:6}}>
                     {currentQuestion.prompts.map((p,pi) => {
                       const selected = isPromptSelected(p);
                       return (
-                        <button key={pi} onClick={() => handlePromptClick(p)} style={{display:"flex",alignItems:"center",gap:8,width:"100%",textAlign:"left",fontSize:14,padding:"10px 12px",borderRadius:10,border:selected?"1.5px solid "+sc.accent:"0.5px solid "+sc.promptBorder,background:selected?sc.light:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:selected?sc.dark:"#475569",cursor:"pointer",transition:"all 0.15s",lineHeight:1.5,fontWeight:selected?500:400}}>
-                          <span style={{flexShrink:0,width:18,height:18,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",background:selected?sc.accent:"rgba(0,0,0,0.04)",transition:"all 0.15s"}}>
-                            {selected && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>}
+                        <button key={pi} onClick={() => handlePromptClick(p)} className="anim-fade" style={{display:"flex",alignItems:"center",gap:10,width:"100%",textAlign:"left",fontSize:14,padding:"11px 14px",borderRadius:12,border:selected?`1.5px solid ${sc.accent}`:`1px solid ${sc.promptBorder}`,background:selected?sc.light:sc.promptBg,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",color:selected?(sc.dark||"#fff"):"rgba(255,255,255,0.6)",cursor:"pointer",lineHeight:1.5,fontWeight:selected?500:400,animationDelay:(pi*0.05)+"s",boxShadow:selected?`0 0 16px ${sc.glow}`:""}}>
+                          <span style={{flexShrink:0,width:20,height:20,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",background:selected?sc.accent:"rgba(255,255,255,0.06)",transition:"all 0.2s"}}>
+                            {selected && <AnimCheck/>}
                           </span>
                           {p}
                         </button>
@@ -601,11 +584,10 @@ function App() {
               </div>
             )}
 
-            {/* Textarea with clear button */}
             <div style={{position:"relative"}}>
-              <textarea ref={textareaRef} value={curAnswer} onChange={e => setAnswers(prev => ({...prev,[currentIndex]:e.target.value}))} placeholder={currentQuestion.type==="confirm"?"請確認或說明需調整之處⋯":"請輸入您的回覆⋯"} style={S.textarea} rows={3}/>
+              <textarea ref={textareaRef} value={curAnswer} onChange={e => setAnswers(prev => ({...prev,[currentIndex]:e.target.value}))} placeholder={currentQuestion.type==="confirm"?"請確認或說明需調整之處⋯":"請輸入您的回覆⋯"} style={{...S.textarea,"::placeholder":{color:"rgba(255,255,255,0.2)"}}} rows={3}/>
               {curAnswer.trim() && (
-                <button onClick={clearAnswer} title="清除此題回答" style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,0.04)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"#94A3B8",display:"flex",transition:"all 0.15s"}}>
+                <button onClick={clearAnswer} title="清除此題回答" style={{position:"absolute",top:10,right:10,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:6,padding:6,cursor:"pointer",color:"rgba(255,255,255,0.25)",display:"flex"}}>
                   <TrashIcon/>
                 </button>
               )}
@@ -614,19 +596,17 @@ function App() {
         </div>
       </div>
 
-      {/* Bottom nav */}
-      <div className="glass-bar" style={{borderTop:"0.5px solid rgba(0,0,0,0.04)",padding:"10px 16px",position:"sticky",bottom:0,zIndex:50}}>
+      <div className="glass-bar" style={{borderTop:"1px solid rgba(255,255,255,0.04)",padding:"10px 16px",position:"sticky",bottom:0,zIndex:50}}>
         <div className="safe-bottom" style={{maxWidth:520,margin:"0 auto",display:"flex",alignItems:"center",gap:6}}>
-          <button onClick={goPrev} disabled={isFirst} style={{...S.btnText,display:"flex",alignItems:"center",gap:2,opacity:isFirst?0.3:1}}><ChevronLeft/> {isFirst?"歡迎頁":"上一題"}</button>
-          <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"#CBD5E1"}}>跳過</button>
+          <button onClick={goPrev} disabled={isFirst} style={{...S.btnText,display:"flex",alignItems:"center",gap:2,opacity:isFirst?0.2:1}}><ChevronLeft/> {isFirst?"歡迎頁":"上一題"}</button>
+          <button onClick={goNext} style={{...S.btnText,fontSize:12,color:"rgba(255,255,255,0.15)"}}>跳過</button>
           <div style={{flex:1}}/>
-          <button onClick={goNext} style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:4,minWidth:isLast?100:undefined,justifyContent:"center"}}>
+          <button onClick={goNext} style={{...S.btnPrimary,display:"flex",alignItems:"center",gap:4,minWidth:isLast?100:undefined,justifyContent:"center",padding:"12px 24px"}}>
             {isLast?(<><CheckIcon size={16} color="#fff"/> 完成</>):(<>下一題 <ChevronRight/></>)}
           </button>
         </div>
       </div>
 
-      {/* Toast */}
       <Toast key={toastKey} message={toastMsg} visible={!!toastMsg}/>
     </div>
   );
