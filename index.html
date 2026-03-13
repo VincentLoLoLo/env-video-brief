@@ -373,15 +373,20 @@ function App() {
   useEffect(() => {
     try {
       const s = localStorage.getItem("env_video_answers");
-      if (s) setAnswers(JSON.parse(s));
-    } catch(e) {}
+      if (s) {
+        const parsed = JSON.parse(s);
+        const firstVal = Object.values(parsed)[0];
+        if (typeof firstVal === "string") { localStorage.removeItem("env_video_answers"); return; }
+        setAnswers(parsed);
+      }
+    } catch(e) { localStorage.removeItem("env_video_answers"); }
   }, []);
   const saveTimerRef = useRef(null);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       try { localStorage.setItem("env_video_answers", JSON.stringify(answers));
-        if (currentIndex >= 0 && Object.keys(answers).length > 0) { setToastMsg("已自動保存"); setToastKey(k => k + 1); }
+        if (currentIndex >= 0 && answeredCount > 0) { setToastMsg("已自動保存"); setToastKey(k => k + 1); }
       } catch(e) {}
     }, 800);
     if (submitStatus === "success") setSubmitStatus("idle");
@@ -394,7 +399,7 @@ function App() {
   const answeredCount = useMemo(() => Object.keys(answers).filter(k => hasAns(Number(k))).length, [answers, hasAns]);
   const currentQuestion = currentIndex >= 0 ? questions[currentIndex] : null;
   const sc = currentQuestion ? SC[currentQuestion.section] : null;
-  const hasResume = useMemo(() => Object.keys(answers).length > 0, [answers]);
+  const hasResume = useMemo(() => answeredCount > 0, [answeredCount]);
   const lastAnswered = useMemo(() => { for (let i = questions.length - 1; i >= 0; i--) { if (hasAns(i)) return i; } return -1; }, [hasAns]);
 
   const goNext = useCallback(() => { setSlideDir("left"); if (currentIndex < total - 1) { setCurrentIndex(currentIndex + 1); setExpandedPrompts(true); } else { setIsComplete(true); } }, [currentIndex, total]);
