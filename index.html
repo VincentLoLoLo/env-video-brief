@@ -168,22 +168,33 @@ function App() {
     if (textareaRef.current) textareaRef.current.focus();
   };
 
-  const doSubmit = async () => {
-    if (!SHEET_SCRIPT_URL) { alert("Google Sheets 連線尚未設定"); return; }
+  const doSubmit = () => {
+    if (!SHEET_SCRIPT_URL) return;
     setSubmitStatus("submitting");
-    try {
-      await fetch(SHEET_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify({
-          timestamp: new Date().toLocaleString("zh-TW"),
-          answers: questions.map((q, i) => answers[i] || "（未填寫）"),
-        }),
-      });
+    const payload = JSON.stringify({
+      timestamp: new Date().toLocaleString("zh-TW"),
+      answers: questions.map((q, i) => answers[i] || "（未填寫）"),
+    });
+    const iframe = document.createElement("iframe");
+    iframe.name = "sheet-submit";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = SHEET_SCRIPT_URL;
+    form.target = "sheet-submit";
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "data";
+    input.value = payload;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    setTimeout(() => {
       setSubmitStatus("success");
-    } catch(e) {
-      setSubmitStatus("error");
-    }
+      try { document.body.removeChild(iframe); } catch(e) {}
+    }, 2000);
   };
 
   const doExport = () => {
@@ -265,22 +276,14 @@ function App() {
               <div style={{background:"#0F172A",height:6,borderRadius:999,transition:"width 0.5s",width:(answeredCount/total*100)+"%"}}/>
             </div>
 
-            {SHEET_SCRIPT_URL ? (
-              <button onClick={doSubmit} disabled={submitStatus==="submitting"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:10,opacity:submitStatus==="submitting"?0.6:1}}>
-                <SendIcon/>
-                {submitStatus==="idle" && "送出回覆"}
-                {submitStatus==="submitting" && "送出中⋯"}
-                {submitStatus==="success" && "已成功送出"}
-                {submitStatus==="error" && "送出失敗，請重試"}
-              </button>
-            ) : null}
-
-            <button onClick={doExport} style={{...S.btnSecondary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-              <DownloadIcon/>
-              下載回覆紀錄 (.txt)
+            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:submitStatus==="submitting"?0.6:1,background:submitStatus==="success"?"#059669":"#0F172A"}}>
+              <SendIcon/>
+              {submitStatus==="idle" && "送出回覆"}
+              {submitStatus==="submitting" && "送出中⋯"}
+              {submitStatus==="success" && "已成功送出"}
+              {submitStatus==="error" && "送出失敗，點此重試"}
             </button>
-
-            {isComplete && <p style={{textAlign:"center",color:"#94A3B8",fontSize:11,marginTop:10}}>下載後傳給 VV 即可</p>}
+            {submitStatus==="success" && <p style={{textAlign:"center",color:"#059669",fontSize:12,marginTop:10,fontWeight:500}}>回覆已送達，感謝副總！</p>}
           </div>
 
           {questions.map((q, i) => {
@@ -315,8 +318,8 @@ function App() {
 
           <div style={{display:"flex",gap:10,marginTop:22,marginBottom:32}}>
             <button onClick={() => {setShowOverview(false);setIsComplete(false);setCurrentIndex(0);}} style={{...S.btnSecondary,flex:1}}>回到第一題</button>
-            <button onClick={doExport} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-              <DownloadIcon/> 下載 .txt
+            <button onClick={doSubmit} disabled={submitStatus==="submitting"||submitStatus==="success"} style={{...S.btnPrimary,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:submitStatus==="success"?"#059669":"#0F172A"}}>
+              <SendIcon/> {submitStatus==="success"?"已送出":"送出回覆"}
             </button>
           </div>
         </div>
