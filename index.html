@@ -351,7 +351,21 @@ function App() {
     }
   }, [currentIndex]);
 
-  useEffect(() => { try { const s = localStorage.getItem("env_video_answers"); if (s) setAnswers(JSON.parse(s)); } catch(e) {} }, []);
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem("env_video_answers");
+      if (s) {
+        const saved = JSON.parse(s);
+        setAnswers(saved);
+        /* Auto-resume: jump to last answered + 1 */
+        const keys = Object.keys(saved).filter(k => saved[k] && saved[k].trim()).map(Number);
+        if (keys.length > 0) {
+          const lastIdx = Math.max(...keys);
+          setTimeout(() => setCurrentIndex(Math.min(lastIdx + 1, questions.length - 1)), 1900);
+        }
+      }
+    } catch(e) {}
+  }, []);
   const saveTimerRef = useRef(null);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
