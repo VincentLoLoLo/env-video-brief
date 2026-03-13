@@ -379,6 +379,10 @@ function App() {
   }, [currentIndex]);
 
   useEffect(() => {
+    if (showOverview || isComplete) window.scrollTo(0, 0);
+  }, [showOverview, isComplete]);
+
+  useEffect(() => {
     try {
       const s = localStorage.getItem("env_video_answers");
       if (s) {
