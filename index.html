@@ -119,11 +119,6 @@ const CheckIcon = () => (
     <path d="M5 13l4 4L19 7"/>
   </svg>
 );
-const DownloadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-);
 const SendIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -137,6 +132,7 @@ function App() {
   const [showOverview, setShowOverview] = useState(false);
   const [expandedPrompts, setExpandedPrompts] = useState(true);
   const [submitStatus, setSubmitStatus] = useState("idle");
+  const submittingRef = useRef(false);
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -169,16 +165,21 @@ function App() {
   };
 
   const doSubmit = () => {
-    if (!SHEET_SCRIPT_URL) return;
+    if (!SHEET_SCRIPT_URL || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitStatus("submitting");
     const payload = JSON.stringify({
       timestamp: new Date().toLocaleString("zh-TW"),
       answers: questions.map((q, i) => answers[i] || "（未填寫）"),
     });
-    const iframe = document.createElement("iframe");
-    iframe.name = "sheet-submit";
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
+    let iframe = document.getElementById("sheet-submit-frame");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.id = "sheet-submit-frame";
+      iframe.name = "sheet-submit";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+    }
     const form = document.createElement("form");
     form.method = "POST";
     form.action = SHEET_SCRIPT_URL;
@@ -191,31 +192,9 @@ function App() {
     document.body.appendChild(form);
     form.submit();
     document.body.removeChild(form);
-    setTimeout(() => {
-      setSubmitStatus("success");
-      try { document.body.removeChild(iframe); } catch(e) {}
-    }, 2000);
+    setTimeout(() => { setSubmitStatus("success"); }, 2500);
   };
 
-  const doExport = () => {
-    let t = "環境部兩支影片需求問卷 — 副總回覆紀錄\n";
-    t += "填寫日期：" + new Date().toLocaleDateString("zh-TW") + "\n";
-    t += "=".repeat(50) + "\n\n";
-    let sec = "";
-    questions.forEach((q, i) => {
-      if (q.section !== sec) { sec = q.section; t += "\n" + "─".repeat(40) + "\n" + sec + "\n" + "─".repeat(40) + "\n\n"; }
-      const a = answers[i] ? answers[i].trim() : "";
-      t += "【第 " + q.id + " 題】" + q.title + "\n";
-      if (q.prefilled) t += "（已知資訊）" + q.prefilled + "\n";
-      t += "副總回覆：" + (a || "（未填寫）") + "\n\n";
-    });
-    t += "=".repeat(50) + "\n共 " + total + " 題，已填 " + answeredCount + " 題\n";
-    const blob = new Blob([t], {type:"text/plain;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "環境部影片需求_副總回覆_" + new Date().toISOString().slice(0,10) + ".txt";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  };
 
   /* ════════════════════════════════════════ */
   /* ═══ Welcome ═══ */
