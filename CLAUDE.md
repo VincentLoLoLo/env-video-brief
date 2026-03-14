@@ -1,27 +1,35 @@
-# 環境部影片需求問卷
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 專案概述
-線上問卷，讓環境部副總透過手機填寫影片製作需求。語音友善的對話式一問一答介面。
+線上問卷，讓環境部副總（甲方）透過手機填寫影片製作需求。對話式一問一答介面，開發者（乙方，無團隊）向甲方釐清需求。
 
 ## 線上網址
-- **GitHub Pages**: vincentlololo.github.io/env-video-questionnaire/
-- **Repo**: VincentLoLoLo/env-video-questionnaire（Public, main branch）
+- **GitHub Pages**: vincentlololo.github.io/env-video-brief/
+- **Repo**: VincentLoLoLo/env-video-brief（Public, main branch）
+- ~~舊 repo: env-video-questionnaire / env-video-form（被 Google Safe Browsing 標記，已棄用）~~
 
 ## 技術架構
 - 單一 `index.html`，無建置步驟
 - React 18 + ReactDOM 18 + Babel Standalone 7.23.9（瀏覽器端 JSX 轉譯）
 - Inline CSS styles + CSS animations（無 Tailwind）
 - Inter (Google Fonts) + PingFang TC 字體
-- Canvas animated gradient background（5 浮動色球）
+- Canvas animated gradient background（5 浮動色球，背景 #0c0f1a）
 - macOS 風格毛玻璃效果（backdrop-filter blur + dark theme）
 
 ## 部署流程
 ```bash
+# 前端（GitHub Pages）
 git add index.html
 git commit -m "描述"
 git push origin main
-# GitHub Pages 自動部署，約 1-2 分鐘
-# 手動觸發：gh api -X POST repos/VincentLoLoLo/env-video-questionnaire/pages/builds
+gh api -X POST repos/VincentLoLoLo/env-video-brief/pages/builds
+
+# Apps Script（clasp CLI）
+clasp push && clasp deploy -d "描述"
+# 每次 deploy 產生新 URL，須同步更新 index.html 的 SHEET_SCRIPT_URL
+# 首次部署需在瀏覽器授權一次（clasp open → 執行任意函式 → 允許權限）
 ```
 
 ## Git 認證
@@ -30,42 +38,42 @@ git push origin main
 
 ## 檔案結構
 ```
-/
-├── index.html              ← 問卷主體（唯一需要維護的檔案）
-├── google-apps-script.js   ← Google Sheets 串接用的 Apps Script 程式碼
-├── README.md
-└── CLAUDE.md
+index.html              ← 問卷主體（唯一前端檔案）
+google-apps-script.js   ← Apps Script 程式碼（clasp push 上傳）
+appsscript.json         ← Apps Script 設定（webapp, timezone）
+.clasp.json             ← clasp 設定（scriptId, rootDir, parentId）
+.claspignore            ← 只上傳 google-apps-script.js + appsscript.json
 ```
 
-## index.html 結構
-- **31 題，5 段落**：
-  - A 整體背景（6 題，藍色 #3B82F6）— 場合、觀眾、時程、預算、參考、禁忌
-  - B 開場影片（8 題，琥珀色 #F59E0B）— 歡樂氛圍、部長入鏡、舞伴
-  - C 1999 整合（9 題，翠綠色 #10B981）— 服務整合、一鏡到底、多管道
-  - D 影片規格（7 題，玫紅色 #EC4899）— 畫面類型、音樂、色調、字卡、節奏、格式
-  - E 補充（1 題，紫色 #A855F7）— 自由補充
-- **兩種題型**：`confirm`（已知待確認）、`open`（開放式）
-- **元件**：App → Splash / Welcome / Question / Overview 四畫面
-- **側邊欄**：桌面版固定 260px，手機版漢堡選單抽屜
-- **時間軸**：頂部五段式彩色進度條
+## index.html 架構
+- **31 題，5 段落**（SC 物件定義各段顏色）：
+  - A 整體背景（6 題，#3B82F6）· B 開場影片（8 題，#F59E0B）· C 1999 整合（9 題，#10B981）· D 影片規格（7 題，#EC4899）· E 補充（1 題，#A855F7）
+- **題型**：`confirm`（已知待確認，有 prefilled）、`open`（開放式）
+- **複選標記**：`multi:true` 的題目允許多選（Q1,2,3,6,16,17,19,22）
+- **四個畫面**：Splash → Welcome → Question → Overview（isComplete / showOverview）
+- **答案資料模型**：`{selected: "選中的 prompt 文字", note: "補充文字"}`，多選用 `\n` 分隔 selected
+- **UI 元件**：Sidebar（桌面固定 260px / 手機漢堡抽屜）、Timeline（頂部五段彩色進度條）
 - **響應式**：768px 斷點（isWide state）
-- **動畫**：Canvas 浮動色球背景、毛玻璃面板、滑動切換、紙屑慶祝
 
 ## Google Sheets 串接
-- Apps Script URL: `https://script.google.com/macros/s/AKfycbzQU97_ZCoBzm6yAZymP-rECJTxZ4BfaGpj07IyqSv7ZW-GAErikF3wKBXwpo2deRsn/exec`
-- 提交方式：hidden iframe form submission（繞過 CORS）
-- Apps Script 需讀取 `e.parameter.data`（表單提交格式）
-- **用戶需自行在 Apps Script 編輯器部署新版本**
+- **Apps Script URL**: `https://script.google.com/macros/s/AKfycbxkXos321qpb9izn3zYfsi6K_QLYUY2MFMKbRn5W_1yaDoo3gACs6fy1xUfsqQOOmf8Dw/exec`
+- **Script Project ID**: `1Md76z76CPuZctfSBfpgGmNMbSMD5fFSW134ELDZ6wvg9VJCq7-kVN3NL`
+- **目標 Sheet**: `1NulQPHDvnSC1GD1DuxApOPbzPKtrrgZeY_1NeXew2lM`（用 `openById` 指定，非 getActiveSpreadsheet）
+- **提交方式**: hidden iframe form submission（繞過 CORS），data 欄位為 JSON 字串
+- **Apps Script 支援**: `e.parameter.data`（表單提交）和 `e.postData.contents`（JSON body）
+- **HEADERS**: 31 欄完整題目文字，方便匯入 AI 分析
+- **clasp 登入帳號**: therock78331@gmail.com
 
 ## 已知問題與教訓
-1. iOS Safari 的 textarea fontSize 必須 ≥ 16px，否則會觸發自動放大
+1. iOS Safari textarea fontSize 必須 ≥ 16px，否則觸發自動放大
 2. `env(safe-area-inset-bottom)` 用於 iPhone 底部安全區域
-3. localStorage key: `env_video_answers`
+3. localStorage key: `env_video_answers`，舊版字串格式會自動清除
 4. Babel Standalone 首次載入約 0.5 秒白屏是正常的
 5. Google Apps Script POST 有 CORS 限制，用 hidden iframe + form 提交繞過
 6. 防重複送出：submittingRef（useRef）作即時鎖 + disabled 屬性
-
-## 角色定義
-- 副總 = 甲方（填寫者）
-- 我（開發者）= 乙方，無團隊
-- 問卷語氣：乙方個人向甲方釐清需求的敘述
+7. React hooks 中 `const` 有 temporal dead zone — getAns/hasAns/ansText 必須定義在 useAutoResize 之前
+8. `hasResume` 判斷用 `answeredCount > 0`，不可用 `Object.keys(answers).length`（空物件會誤判）
+9. 手機版選擇 prompt 後不可 auto-focus textarea（會彈出鍵盤影響體驗）
+10. clasp deploy 每次產生新 URL，舊 deployment URL 指向舊版程式碼不會自動更新
+11. clasp 新建 project 首次部署必須在瀏覽器執行一次函式才能授權 web app
+12. Overview / 完成頁面需 `window.scrollTo(0, 0)` — 與 Question 頁面的 contentRef.scrollTop 分開處理
