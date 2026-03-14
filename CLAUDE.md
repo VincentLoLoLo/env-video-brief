@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 線上問卷，讓環境部副總（甲方）透過手機填寫影片製作需求。對話式一問一答介面，開發者（乙方，無團隊）向甲方釐清需求。
 
 ## 線上網址
-- **GitHub Pages**: vincentlololo.github.io/env-video-brief/
+- **Vercel（正式）**: https://env-video-brief.vercel.app
 - **Repo**: VincentLoLoLo/env-video-brief（Public, main branch）
-- ~~舊 repo: env-video-questionnaire / env-video-form（被 Google Safe Browsing 標記，已棄用）~~
+- GitHub Pages 已關閉（github.io 域名被 Google Safe Browsing 誤標記）
 
 ## 技術架構
 - 單一 `index.html`，無建置步驟
@@ -20,11 +20,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 部署流程
 ```bash
-# 前端（GitHub Pages）
+# 前端（Vercel — push 到 main 自動部署）
 git add index.html
 git commit -m "描述"
 git push origin main
-gh api -X POST repos/VincentLoLoLo/env-video-brief/pages/builds
+# Vercel 已連接 GitHub repo，push 即觸發自動部署
 
 # Apps Script（clasp CLI）
 clasp push && clasp deploy -d "描述"
