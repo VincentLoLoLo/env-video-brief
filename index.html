@@ -439,13 +439,10 @@ function App() {
     if (!SHEET_SCRIPT_URL || submittingRef.current) return;
     submittingRef.current = true; setSubmitStatus("submitting");
     try {
-      const payload = JSON.stringify({timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>ansText(i)||"（未填寫）")});
-      let iframe = document.getElementById("sheet-submit-frame");
-      if (!iframe) { iframe = document.createElement("iframe"); iframe.id="sheet-submit-frame"; iframe.name="sheet-submit"; iframe.style.display="none"; document.body.appendChild(iframe); }
-      const form = document.createElement("form"); form.method="POST"; form.action=SHEET_SCRIPT_URL; form.target="sheet-submit";
-      const input = document.createElement("input"); input.type="hidden"; input.name="data"; input.value=payload;
-      form.appendChild(input); document.body.appendChild(form); form.submit(); document.body.removeChild(form);
-      setTimeout(() => { setSubmitStatus("success"); submittingRef.current = false; setShowConfetti(true); setTimeout(() => setShowConfetti(false), 4000); }, 2500);
+      const payload = {timestamp:new Date().toLocaleString("zh-TW"),answers:questions.map((q,i)=>ansText(i)||"（未填寫）")};
+      fetch(SHEET_SCRIPT_URL, {method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(payload)})
+        .then(() => { setSubmitStatus("success"); submittingRef.current = false; setShowConfetti(true); setTimeout(() => setShowConfetti(false), 4000); })
+        .catch(() => { setSubmitStatus("error"); submittingRef.current = false; });
     } catch(err) { setSubmitStatus("error"); submittingRef.current = false; }
   };
 
